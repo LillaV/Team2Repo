@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.persistence.model;
 
+import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,11 +20,9 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private ERole name;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "role_permission",
             joinColumns = @JoinColumn(name = "role_id"),

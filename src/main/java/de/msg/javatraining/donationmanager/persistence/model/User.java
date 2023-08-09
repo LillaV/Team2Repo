@@ -30,6 +30,7 @@ public class User {
     private boolean active;
     private boolean newUser;
     private String username;
+    private String mobileNumber;
     @Column(nullable = false)
     private String email;
     @ManyToMany(fetch = FetchType.EAGER)
@@ -43,12 +44,6 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-
-    public User(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
 
 
 }

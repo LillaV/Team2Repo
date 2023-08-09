@@ -48,17 +48,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public void saveUser(UserDto userDto) {
-        User userToSave = userMapper.userDtoToUser(userDto);
-        userRepository.save(userToSave);
+        /*User userToSave = userMapper.userDtoToUser(userDto);
+        userRepository.save(userToSave);*/
 
     }
 
     public void updateUser(Long id, UserDto userDto) {
-        User newUser = userRepository.findById(id).get();
+        /*User newUser = userRepository.findById(id).get();
         newUser.setUsername(userDto.getUsername());
         newUser.setEmail(userDto.getEmail());
         newUser.setPassword(userDto.getPassword());
-        userRepository.save(newUser);
+        userRepository.save(newUser);*/
     }
 
     public void deleteUserById(Long id) {

@@ -14,4 +14,5 @@ public class RestResponseStatusExceptionResolver {
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
+
 }

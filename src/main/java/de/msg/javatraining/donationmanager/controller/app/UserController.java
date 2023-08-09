@@ -3,6 +3,8 @@ package de.msg.javatraining.donationmanager.controller.app;
 import de.msg.javatraining.donationmanager.persistence.dtos.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.MailUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.UserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.UserDtoCreate;
+import de.msg.javatraining.donationmanager.service.UserDetailsServiceImpl;
 import de.msg.javatraining.donationmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,25 +28,30 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> findById(@PathVariable("id") Long id) {
-        UserDto user = userService.findById(id);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+      /*  UserDto user = userService.findById(id);*/
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<String> saveUser(@RequestBody UserDto user) {
-        //userService.saveUser(user);
-        return new ResponseEntity<>("User saved", HttpStatus.OK);
+//    @PostMapping("/users")
+//    public ResponseEntity<String> saveUser(@RequestBody UserDto user) {
+//        userService.saveUser(user);
+//        return new ResponseEntity<>("User saved", HttpStatus.OK);
+//    }
+    @PostMapping("/users")
+    public ResponseEntity<String> saveUser(@RequestBody UserDtoCreate user) {
+        try{
+            userService.saveUser(user);
+            return new ResponseEntity<>("User saved", HttpStatus.OK);
+        }
+        catch (Exception exception){
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        }
+
     }
 
-    @PostMapping("/send")
-    public void sendEmail(@RequestBody MailUserDto user){
-        user.setPassword(this.userService.sendSimpleMessage(user));
-        //aici mai trebuie salvata parola
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity updateUser(@RequestBody UpdateUserDto updateUserDto, @PathVariable("id") Long id) {
-        userService.updateUser(id, updateUserDto);
+    @PutMapping("/users/{id}")
+    public ResponseEntity UpdateUser(@RequestBody UserDto user, @PathVariable("id") Long id) {
+        userService.updateUser(id, user);
         return new ResponseEntity<>( HttpStatus.OK);
     }
 

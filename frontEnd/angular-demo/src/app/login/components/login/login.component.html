@@ -1,0 +1,17 @@
+<form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+
+  <div>
+    <label for="username">Username: </label>
+    <input id="username" type="text" formControlName="username">
+  </div>
+
+  <div>
+    <label for="password">Password: </label>
+    <input id="password" type="text" formControlName="password">
+  </div>
+
+  <p>Complete the form to enable button.</p>
+  <button mat-raised-button disabled type="submit"  [disabled]="!loginForm.valid" color="accent">Login</button>
+
+</form>
+

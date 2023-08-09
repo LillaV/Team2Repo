@@ -21,7 +21,7 @@ public class UpdateUserDto {
     private boolean active;
     private boolean newUser;
     private String email;
-    private String phoneNumber;
+    private String mobileNumber;
     private Set<Campaign> campaigns = new HashSet<>();
     private String password;
     private Set<Role> roles = new HashSet<>();

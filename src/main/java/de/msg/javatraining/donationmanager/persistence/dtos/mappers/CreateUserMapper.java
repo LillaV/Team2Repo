@@ -1,8 +1,5 @@
 package de.msg.javatraining.donationmanager.persistence.dtos.mappers;
 
-import de.msg.javatraining.donationmanager.persistence.dtos.CreateUserDto;
-import de.msg.javatraining.donationmanager.persistence.model.User;
-
 public class CreateUserMapper {
 
     /*public User createUserDtoToUser(CreateUserDto createUserDto) {

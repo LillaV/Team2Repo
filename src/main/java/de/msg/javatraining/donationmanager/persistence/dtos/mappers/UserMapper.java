@@ -2,9 +2,10 @@ package de.msg.javatraining.donationmanager.persistence.dtos.mappers;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.UserDto;
 import de.msg.javatraining.donationmanager.persistence.model.User;
+import org.mapstruct.Mapper;
 
-public class UserMapper {
-    public static UserDto UserToUserDto(User user) {
-        return  new UserDto(user.getId(), user.getFirstName(),user.getLastName(),user.isActive(),user.getEmail(),user.getMobileNumber(),user.getRoles(),user.getCampaigns());
-    }
+@Mapper
+public interface UserMapper {
+    UserDto userToUserDto(User user);
+    User userDtoToUser(UserDto userDto);
 }

@@ -27,6 +27,7 @@ public class User {
     private String firstName;
     @Column(nullable = false)
     private String lastName;
+    private String phoneNumber;
     private boolean active;
     private boolean newUser;
     private String username;

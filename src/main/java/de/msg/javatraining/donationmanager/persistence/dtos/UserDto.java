@@ -2,15 +2,14 @@ package de.msg.javatraining.donationmanager.persistence.dtos;
 
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.swing.text.StyledEditorKit;
 import java.util.HashSet;
 import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor

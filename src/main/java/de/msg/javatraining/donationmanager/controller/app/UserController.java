@@ -1,6 +1,8 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
+import de.msg.javatraining.donationmanager.persistence.dtos.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.UserDto;
+import de.msg.javatraining.donationmanager.service.MailUserService;
 import de.msg.javatraining.donationmanager.service.UserDetailsServiceImpl;
 import de.msg.javatraining.donationmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,11 @@ public class UserController {
     @Autowired
     private UserDetailsServiceImpl userService;
     @Autowired
+    private MailUserService mailService;
+    @Autowired
     private UserService userService2;
+  
+  
     @GetMapping("/{offset}/{pageSize}")
     public List<UserDto> getPage(@PathVariable(name = "offset") int offset,@PathVariable(name = "pageSize") int pageSize) {
         return userService2.allUsersWithPagination(offset, pageSize);
@@ -33,6 +39,12 @@ public class UserController {
     public ResponseEntity<String> saveUser(@RequestBody UserDto user) {
         userService.saveUser(user);
         return new ResponseEntity<>("User saved", HttpStatus.OK);
+    }
+
+    @PostMapping("/send")
+    public void sendEmail(@RequestBody CreateUserDto user){
+        user.setPassword(this.mailService.sendSimpleMessage(user));
+        //aici mai trebuie salvata parola
     }
 
     @PutMapping("/{id}")

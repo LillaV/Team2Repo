@@ -1,6 +1,7 @@
 package de.msg.javatraining.donationmanager.service;
 
-
+import de.msg.javatraining.donationmanager.persistence.dtos.CreateUserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.dtos.UserDto;
@@ -26,6 +27,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     //private UserMapper userMapper = new UserMapper();
+
+    CreateUserMapper createUserMapper=new CreateUserMapper();
 
     @Override
     @Transactional
@@ -55,8 +58,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public void saveUser(UserDto userDto) {
         User userToSave = userMapper.userDtoToUser(userDto);
         userRepository.save(userToSave);
-
     }
+
 
     public void updateUser(Long id, UpdateUserDto updateUserDto) {
         User updatedUser = userRepository.findById(id).get();

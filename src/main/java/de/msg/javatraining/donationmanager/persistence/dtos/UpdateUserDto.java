@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.persistence.dtos;
 
+import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,19 +15,14 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-
-    private Long id;
-
-
-    private String username;
-
-
+public class UpdateUserDto {
+    private String firstName;
+    private String lastName;
+    private boolean active;
+    private boolean newUser;
     private String email;
-
-
+    private String phoneNumber;
+    private Set<Campaign> campaigns = new HashSet<>();
     private String password;
-
     private Set<Role> roles = new HashSet<>();
-
 }

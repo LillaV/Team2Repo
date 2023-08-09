@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
+import de.msg.javatraining.donationmanager.persistence.dtos.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.UserDto;
 import de.msg.javatraining.donationmanager.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,8 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity UpdateUser(@RequestBody UserDto user, @PathVariable("id") Long id) {
-        userService.updateUser(id, user);
+    public ResponseEntity UpdateUser(@RequestBody UpdateUserDto updateUserDto, @PathVariable("id") Long id) {
+        userService.updateUser(id, updateUserDto);
         return new ResponseEntity<>( HttpStatus.OK);
     }
 

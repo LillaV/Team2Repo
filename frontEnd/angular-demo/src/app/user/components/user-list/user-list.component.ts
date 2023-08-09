@@ -10,7 +10,6 @@ import {tap} from "rxjs";
 })
 export class UserListComponent implements OnInit {
 
-  // @Input()
   userList: User[];
 
   constructor(private userService: UserService) {
@@ -22,7 +21,6 @@ export class UserListComponent implements OnInit {
   }
 
   editUser(userToEdit: User) {
-    //userToEdit.username = 'admin';
     this.userService.updateUser(userToEdit).subscribe( ()=> this.userService.loadUsers());
   }
 }

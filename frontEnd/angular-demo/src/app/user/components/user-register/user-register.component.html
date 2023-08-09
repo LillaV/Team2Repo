@@ -21,11 +21,21 @@
   </div>
 
   <div>
-    <label for="roles">Roles: </label>
-    <input id="roles" type="text" formControlName="roles">
+    <mat-chip-list selectable multiple>
+      <mat-chip
+        #c="matChip"
+        *ngFor="let role of roleList"
+        [value]="role"
+        (click)="toggleSelection(c, role)"
+      >
+        {{role.roleName}}
+      </mat-chip>
+    </mat-chip-list>
   </div>
 
-  <p>Complete the form to enable button.</p>
+<div>
   <button mat-raised-button disabled type="submit"  [disabled]="!registerForm.valid" color="accent">Save</button>
+</div>
+
 
 </form>

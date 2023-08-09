@@ -7,7 +7,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {UserRoutingModule} from './user/user-routing.module';
 import {DonationRoutingModule} from './donations/donation-routing.module';
 import {UserRegisterComponent} from './user/components/user-register/user-register.component';
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatMenuModule} from "@angular/material/menu";
 import {MatButtonModule} from '@angular/material/button';
@@ -17,14 +17,13 @@ import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from "@angular/common/h
 import {LoginService} from "./login/services/login.service";
 import {Interceptor} from "./util/interceptors/interceptor";
 import {RoleGuard} from "./util/Roleguard";
-
+import {MatChipsModule} from "@angular/material/chips";
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
     AppComponent,
     UserRegisterComponent,
-
-
   ],
   imports: [
     BrowserModule,
@@ -38,7 +37,10 @@ import {RoleGuard} from "./util/Roleguard";
     BrowserAnimationsModule,
     MatButtonModule,
     LoginModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule,
+    MatChipsModule,
+    MatIconModule,
   ],
   providers: [
     LoginService, {provide: HTTP_INTERCEPTORS, useClass: Interceptor, multi: true},RoleGuard

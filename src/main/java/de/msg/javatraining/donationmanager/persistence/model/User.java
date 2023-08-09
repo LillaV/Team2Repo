@@ -30,6 +30,7 @@ public class User {
     private boolean active;
     private boolean newUser;
     private String username;
+    private String phoneNumber;
     @Column(nullable = false)
     private String email;
     @ManyToMany(fetch = FetchType.EAGER)

@@ -45,8 +45,8 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers("/auth/**", "/app/test/**").permitAll() //these requests are allowed
-//                .authorizeHttpRequests(request -> request.requestMatchers("/auth/**", "/app/test/**", "/users/**", "/users/*").permitAll() //these requests are allowed
+  //              .authorizeHttpRequests(request -> request.requestMatchers("/auth/**", "/app/test/**").permitAll() //these requests are allowed
+                .authorizeHttpRequests(request -> request.requestMatchers("/auth/**", "/app/test/**", "/users/**").permitAll() //these requests are allowed
                         .anyRequest().authenticated()) //any other request must be authenticated
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS)) // we don't want sessions
                 //.authenticationProvider(authenticationProvider())

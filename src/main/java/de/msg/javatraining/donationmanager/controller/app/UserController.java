@@ -1,9 +1,8 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
-import de.msg.javatraining.donationmanager.persistence.dtos.CreateUserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.UpdateUserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.MailUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.UserDto;
-import de.msg.javatraining.donationmanager.service.MailUserService;
-import de.msg.javatraining.donationmanager.service.UserDetailsServiceImpl;
 import de.msg.javatraining.donationmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,16 +16,12 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     @Autowired
-    private UserDetailsServiceImpl userService;
-    @Autowired
-    private MailUserService mailService;
-    @Autowired
-    private UserService userService2;
-  
-  
+    private UserService userService;
+
+
     @GetMapping("/{offset}/{pageSize}")
     public List<UserDto> getPage(@PathVariable(name = "offset") int offset,@PathVariable(name = "pageSize") int pageSize) {
-        return userService2.allUsersWithPagination(offset, pageSize);
+        return userService.allUsersWithPagination(offset, pageSize);
     }
 
     @GetMapping("/{id}")
@@ -37,18 +32,18 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<String> saveUser(@RequestBody UserDto user) {
-        userService.saveUser(user);
+        //userService.saveUser(user);
         return new ResponseEntity<>("User saved", HttpStatus.OK);
     }
 
     @PostMapping("/send")
-    public void sendEmail(@RequestBody CreateUserDto user){
-        user.setPassword(this.mailService.sendSimpleMessage(user));
+    public void sendEmail(@RequestBody MailUserDto user){
+        user.setPassword(this.userService.sendSimpleMessage(user));
         //aici mai trebuie salvata parola
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity UpdateUser(@RequestBody UpdateUserDto updateUserDto, @PathVariable("id") Long id) {
+    public ResponseEntity updateUser(@RequestBody UpdateUserDto updateUserDto, @PathVariable("id") Long id) {
         userService.updateUser(id, updateUserDto);
         return new ResponseEntity<>( HttpStatus.OK);
     }

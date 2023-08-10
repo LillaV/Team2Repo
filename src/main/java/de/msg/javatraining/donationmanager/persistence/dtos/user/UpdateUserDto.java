@@ -1,4 +1,4 @@
-package de.msg.javatraining.donationmanager.persistence.dtos;
+package de.msg.javatraining.donationmanager.persistence.dtos.user;
 
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Role;

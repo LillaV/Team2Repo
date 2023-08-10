@@ -1,9 +1,8 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
-import de.msg.javatraining.donationmanager.persistence.dtos.UpdateUserDto;
-import de.msg.javatraining.donationmanager.persistence.dtos.MailUserDto;
-import de.msg.javatraining.donationmanager.persistence.dtos.UserDto;
-import de.msg.javatraining.donationmanager.persistence.dtos.UserDtoCreate;
+import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.service.UserDetailsServiceImpl;
 import de.msg.javatraining.donationmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ public class UserController {
 //        return new ResponseEntity<>("User saved", HttpStatus.OK);
 //    }
     @PostMapping("/users")
-    public ResponseEntity<String> saveUser(@RequestBody UserDtoCreate user) {
+    public ResponseEntity<String> saveUser(@RequestBody CreateUserDto user) {
         try{
             userService.saveUser(user);
             return new ResponseEntity<>("User saved", HttpStatus.OK);
@@ -50,7 +49,7 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity UpdateUser(@RequestBody UserDto user, @PathVariable("id") Long id) {
+    public ResponseEntity UpdateUser(@RequestBody() UpdateUserDto user, @PathVariable("id") Long id) {
         userService.updateUser(id, user);
         return new ResponseEntity<>( HttpStatus.OK);
     }

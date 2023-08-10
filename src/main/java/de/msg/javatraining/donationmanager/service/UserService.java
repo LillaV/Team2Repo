@@ -1,59 +1,43 @@
 package de.msg.javatraining.donationmanager.service;
 
-import de.msg.javatraining.donationmanager.persistence.dtos.MailUserDto;
-import de.msg.javatraining.donationmanager.persistence.dtos.UpdateUserDto;
-import de.msg.javatraining.donationmanager.persistence.dtos.UserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
+import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.UserMapper;
+import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
+import de.msg.javatraining.donationmanager.persistence.model.Campaign;
+import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
-import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
+import de.msg.javatraining.donationmanager.service.utils.UserServiceUtils;
+import de.msg.javatraining.donationmanager.service.validation.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     @Autowired
-    UserRepository userRepository;
-    @Autowired
     UserMapper userMapper;
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
-    private JavaMailSender emailSender ;
-
-    public String generateUUID(){
-        UUID uuid=UUID.randomUUID();
-        return uuid.toString();
-    }
-    public String sendSimpleMessage(MailUserDto userDto){
-        SimpleMailMessage message= new SimpleMailMessage();
-        String passwd=generateUUID();
-        message.setFrom("iana.baltes@gmail.com");
-        message.setTo(userDto.getEmail());
-        message.setSubject("Activate account");
-        message.setText("Hello " + userDto.getUsername() +
-                "!\nThank you for registering! For your first time logging in, " +
-                "you will have to use the following password:\n"
-                +passwd);
-        emailSender.send(message);
-        return passwd;
-    }
+    UserServiceUtils serviceUtils;
+    @Autowired
+    IUserServiceFactory factory;
 
     public List<UserDto> allUsersWithPagination(int offset, int pageSize){
-        Page<User> users =  userRepository.findAll(PageRequest.of(offset, pageSize));
+        Page<User> users =  factory.getUserRepository().findAll(PageRequest.of(offset, pageSize));
         return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
     }
 
     public void updateUser(Long id, UpdateUserDto updateUserDto) {
-        User updatedUser = userRepository.findById(id).get();
+        User updatedUser = factory.getUserRepository().findById(id).get();
         updatedUser.setFirstName(updateUserDto.getFirstName());
         updatedUser.setLastName(updateUserDto.getLastName());
         updatedUser.setActive(updateUserDto.isActive());
@@ -65,15 +49,45 @@ public class UserService {
             updatedUser.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
         }
         updatedUser.setRoles(updateUserDto.getRoles());
-        userRepository.save(updatedUser);
+        factory.getUserRepository().save(updatedUser);
     }
 
     public UserDto findById(Long id) {
-        User userToFind = userRepository.findById(id).get();
+        User userToFind = factory.getUserRepository().findById(id).get();
         return userMapper.userToUserDto(userToFind);
     }
 
     public void deleteUserById(Long id) {
-        userRepository.deleteById(id);
+        factory.getUserRepository().deleteById(id);
+    }
+
+    public void saveUser(CreateUserDto userDto) {
+        Set<Role> roles = new HashSet<>();
+        Set<Campaign> campaigns = new HashSet<>();
+        for (long id : userDto.getRolesIDs()) {
+            Optional<Role> role = factory.getRoleRepository().findById(id);
+            if (role.isPresent()) {
+                roles.add(role.get());
+            }
+        }
+        for (long id : userDto.getCampaignIDs()) {
+            Optional<Campaign> campaign = factory.getCampaignRepository().findById(id);
+            if (campaign.isPresent()) {
+                campaigns.add(campaign.get());
+            }
+        }
+        User userToSave = CreateUserMapper.createUserDtoToUser(userDto, roles, campaigns);
+        String password = UserServiceUtils.generateUUID();
+        userToSave.setPassword(password);
+        if (UserValidator.userValidation(userToSave)) {
+            userToSave.setUsername(serviceUtils.generateUsername(userToSave,factory.getUserRepository().findAll()));
+            User user = factory.getUserRepository().save(userToSave);
+            if(user != null) {
+                UserServiceUtils.sendSimpleMessage(user,password);
+            }
+        } else {
+            System.out.println("Cannot save");
+        }
+
     }
 }

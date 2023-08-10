@@ -1,4 +1,4 @@
-package de.msg.javatraining.donationmanager.persistence.dtos;
+package de.msg.javatraining.donationmanager.persistence.dtos.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDtoCreate {
+public class CreateUserDto {
     private String firstName;
     private String lastName;
     private String phoneNumber;

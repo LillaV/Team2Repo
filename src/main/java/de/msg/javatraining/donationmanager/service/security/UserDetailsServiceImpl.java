@@ -1,4 +1,4 @@
-package de.msg.javatraining.donationmanager.service;
+package de.msg.javatraining.donationmanager.service.security;
 
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
@@ -20,7 +20,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
-
         return UserDetailsImpl.build(user);
     }
 }

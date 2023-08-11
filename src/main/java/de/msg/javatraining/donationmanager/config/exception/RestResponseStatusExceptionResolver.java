@@ -14,5 +14,10 @@ public class RestResponseStatusExceptionResolver {
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = {InvalidRefreshTokenException.class})
+    private  ResponseEntity<String> handleInvalidRefreshToken(InvalidRefreshTokenException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
 
 }

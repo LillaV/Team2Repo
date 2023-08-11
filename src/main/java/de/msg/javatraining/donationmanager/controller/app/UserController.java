@@ -3,7 +3,6 @@ package de.msg.javatraining.donationmanager.controller.app;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
-import de.msg.javatraining.donationmanager.service.UserDetailsServiceImpl;
 import de.msg.javatraining.donationmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

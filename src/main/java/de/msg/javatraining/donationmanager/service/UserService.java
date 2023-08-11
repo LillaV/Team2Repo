@@ -85,7 +85,7 @@ public class UserService {
             userToSave.setUsername(serviceUtils.generateUsername(userToSave,factory.getUserRepository().findAll()));
             User user = factory.getUserRepository().save(userToSave);
             if(user != null) {
-                UserServiceUtils.sendSimpleMessage(user,password);
+                serviceUtils.sendSimpleMessage(user,password);
             }
         } else {
             System.out.println("Cannot save");

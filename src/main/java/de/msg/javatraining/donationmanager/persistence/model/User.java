@@ -33,7 +33,6 @@ public class User {
     private String mobileNumber;
     @Column(nullable = false)
     private String email;
-    private String phoneNumber;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_campaign",
             joinColumns = @JoinColumn(name = "user_id"),

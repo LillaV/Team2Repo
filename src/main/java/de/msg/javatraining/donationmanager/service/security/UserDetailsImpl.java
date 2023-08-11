@@ -1,4 +1,4 @@
-package de.msg.javatraining.donationmanager.service;
+package de.msg.javatraining.donationmanager.service.security;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,31 +17,38 @@ public class UserDetailsImpl implements UserDetails {
 	private Long id;
 	private String username;
 	private String email;
+	private Boolean active;
 	@JsonIgnore
 	private String password;
+	private Boolean newUser;
 
 	private Collection<? extends GrantedAuthority> authorities;
 
 	public UserDetailsImpl(Long id, String username, String email, String password,
-			Collection<? extends GrantedAuthority> authorities) {
+			Collection<? extends GrantedAuthority> authorities,Boolean active,Boolean newUser) {
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.authorities = authorities;
+		this.active = active;
+		this.newUser = newUser;
 	}
 
 	public static UserDetailsImpl build(User user) {
-		List<GrantedAuthority> authorities = user.getRoles().stream()
-				.map(role -> new SimpleGrantedAuthority(role.getName().name()))
-				.collect(Collectors.toList());
+		List<GrantedAuthority> authorities = user.getRoles().stream().map(role -> role.getPermissions().stream()
+						.map(permission -> new SimpleGrantedAuthority(permission.getPermission().name())).collect(Collectors.toList()))
+				.flatMap(List::stream).collect(Collectors.toList());
+
 
 		return new UserDetailsImpl(
 				user.getId(), 
 				user.getUsername(), 
 				user.getEmail(),
 				user.getPassword(), 
-				authorities);
+				authorities,
+				user.isActive(),
+				user.isNewUser());
 	}
 
 	@Override
@@ -51,6 +58,10 @@ public class UserDetailsImpl implements UserDetails {
 
 	public Long getId() {
 		return id;
+	}
+
+	public Boolean isNewUser(){
+		return newUser;
 	}
 
 	public String getEmail() {
@@ -84,7 +95,7 @@ public class UserDetailsImpl implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return active;
 	}
 
 	@Override

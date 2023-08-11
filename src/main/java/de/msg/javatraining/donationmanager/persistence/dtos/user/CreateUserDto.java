@@ -15,7 +15,7 @@ import java.util.Set;
 public class CreateUserDto {
     private String firstName;
     private String lastName;
-    private String phoneNumber;
+    private String mobileNumber;
     private String email;
     private Set<Long> rolesIDs = new HashSet<>();
     private Set<Long> campaignIDs = new HashSet<>();

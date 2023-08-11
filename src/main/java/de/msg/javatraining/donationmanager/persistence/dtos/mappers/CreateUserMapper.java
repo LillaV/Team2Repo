@@ -13,7 +13,7 @@ public class CreateUserMapper {
         user.setFirstName(createUserDto.getFirstName());
         user.setLastName(createUserDto.getLastName());
         user.setEmail(createUserDto.getEmail());
-        user.setMobileNumber(createUserDto.getPhoneNumber());
+        user.setMobileNumber(createUserDto.getMobileNumber());
         user.setRoles(roles);
         user.setCampaigns(campaigns);
         return user;

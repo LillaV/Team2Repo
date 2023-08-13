@@ -31,11 +31,6 @@ public class UserController {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-//    @PostMapping("/users")
-//    public ResponseEntity<String> saveUser(@RequestBody UserDto user) {
-//        userService.saveUser(user);
-//        return new ResponseEntity<>("User saved", HttpStatus.OK);
-//    }
     @PostMapping()
     public ResponseEntity<String> saveUser(@RequestBody CreateUserDto user) {
         try{

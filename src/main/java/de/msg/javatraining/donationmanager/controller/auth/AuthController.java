@@ -2,14 +2,12 @@ package de.msg.javatraining.donationmanager.controller.auth;
 
 
 import de.msg.javatraining.donationmanager.config.security.JwtUtils;
-import de.msg.javatraining.donationmanager.controller.app.UserController;
 import de.msg.javatraining.donationmanager.persistence.repository.RoleRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
 import de.msg.javatraining.donationmanager.service.security.RefreshTokenService;
 import de.msg.javatraining.donationmanager.service.security.UserDetailsImpl;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -49,6 +46,7 @@ public class AuthController {
 
   @Autowired
   JwtUtils jwtUtils;
+
   @Autowired
   RefreshTokenService refreshTokenService;
 
@@ -73,7 +71,7 @@ public class AuthController {
 
     String jwt = jwtUtils.generateJwtToken(userDetails);
 
-    List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
+    List<String> permissions = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
         .collect(Collectors.toList());
 
     String refreshToken = UUID.randomUUID().toString();
@@ -81,7 +79,7 @@ public class AuthController {
     refreshTokenService.createRefreshToken(refreshToken, userDetails.getId());
     HttpHeaders headers = new HttpHeaders();
     headers.add(HttpHeaders.SET_COOKIE, createCookie(refreshToken).toString());
-    return new ResponseEntity<>(new SignInResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles,userDetails.isNewUser(),userDetails.isEnabled()), headers, HttpStatus.OK);
+    return new ResponseEntity<>(new SignInResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), permissions,userDetails.isNewUser(),userDetails.isEnabled()), headers, HttpStatus.OK);
   }
 
   @GetMapping("/refreshToken")
@@ -93,11 +91,11 @@ public class AuthController {
     throw new RuntimeException("Cookie was not set");
   }
 
-  @PostMapping("/logout")
-  public String performLogout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
-    SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-    logoutHandler.logout(request, response, authentication);
-    return "redirect:/home";
+  @DeleteMapping("/logout/{userId}")
+  public ResponseEntity<String> performLogout(@PathVariable("userId")Long id) {
+    SecurityContextHolder.clearContext();
+    refreshTokenService.deleteRefreshTokenForUser(id);
+    return new ResponseEntity<>("Successful Logout",HttpStatus.OK);
   }
 
 

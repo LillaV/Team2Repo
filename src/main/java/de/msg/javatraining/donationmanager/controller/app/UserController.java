@@ -43,13 +43,13 @@ public class UserController {
 
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity UpdateUser(@RequestBody() UpdateUserDto user, @PathVariable("id") Long id) {
-        userService.updateUser(id, user);
+    @PutMapping("/{id}/activation")
+    public ResponseEntity toggleActivation(@PathVariable("id") Long id) {
+        userService.toggleActivation(id);
         return new ResponseEntity<>( HttpStatus.OK);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id) {
         userService.deleteUserById(id);
         return new ResponseEntity<>("User deleted", HttpStatus.OK);

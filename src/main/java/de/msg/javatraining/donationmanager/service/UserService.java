@@ -54,6 +54,12 @@ public class UserService {
         factory.getUserRepository().save(updatedUser);
     }
 
+    public void toggleActivation(Long id){
+        User updatedUser = factory.getUserRepository().findById(id).get();
+        updatedUser.setActive(!updatedUser.isActive());
+        factory.getUserRepository().save(updatedUser);
+    }
+
     public UserDto findById(Long id) {
         User userToFind = factory.getUserRepository().findById(id).get();
         return userMapper.userToUserDto(userToFind);

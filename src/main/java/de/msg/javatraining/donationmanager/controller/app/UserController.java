@@ -19,7 +19,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
+    //@PreAuthorize("hasRole('AUTHORITY_PERMISSION_MANAGEMENT')")
     @GetMapping("/{offset}/{pageSize}")
     public List<UserDto> getPage(@PathVariable(name = "offset") int offset,@PathVariable(name = "pageSize") int pageSize) {
         return userService.allUsersWithPagination(offset, pageSize);
@@ -31,16 +31,11 @@ public class UserController {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-//    @PostMapping("/users")
-//    public ResponseEntity<String> saveUser(@RequestBody UserDto user) {
-//        userService.saveUser(user);
-//        return new ResponseEntity<>("User saved", HttpStatus.OK);
-//    }
     @PostMapping()
     public ResponseEntity<String> saveUser(@RequestBody CreateUserDto user) {
         try{
             userService.saveUser(user);
-            return new ResponseEntity<>("User saved", HttpStatus.OK);
+            return new ResponseEntity<>("Validation in progress...", HttpStatus.OK);
         }
         catch (Exception exception){
             return ResponseEntity.badRequest().body(exception.getMessage());

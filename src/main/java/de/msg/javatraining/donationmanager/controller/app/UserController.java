@@ -18,7 +18,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasRole('PERMISSION_MANAGEMENT')")
+    @PreAuthorize("hasRole('AUTHORITY_PERMISSION_MANAGEMENT')")
     @GetMapping("/{offset}/{pageSize}")
     //@PreAuthorize("hasAuthority('AUTHORITY_CAMP_REPORTING')")
     public List<UserDto> getPage(@PathVariable(name = "offset") int offset,@PathVariable(name = "pageSize") int pageSize) {
@@ -31,7 +31,7 @@ public class UserController {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping("register")
     public ResponseEntity<String> saveUser(@RequestBody CreateUserDto user) {
         try{
             userService.saveUser(user);

@@ -25,12 +25,6 @@ public class UserController {
         return userService.allUsersWithPagination(offset, pageSize);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDto> findById(@PathVariable("id") Long id) {
-      /*  UserDto user = userService.findById(id);*/
-        return new ResponseEntity<>(null, HttpStatus.OK);
-    }
-
     @PostMapping()
     public ResponseEntity<String> saveUser(@RequestBody CreateUserDto user) {
         try{
@@ -40,7 +34,6 @@ public class UserController {
         catch (Exception exception){
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
-
     }
 
     @PutMapping("/{id}/activation")
@@ -49,9 +42,17 @@ public class UserController {
         return new ResponseEntity<>( HttpStatus.OK);
     }
 
+    @PutMapping("/{id}")
+    public  ResponseEntity<String> updateUser(@RequestParam("id")Long id,@RequestBody UpdateUserDto userDto){
+        userService.updateUser(id,userDto);
+        return new ResponseEntity<>("User updated",HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id) {
         userService.deleteUserById(id);
         return new ResponseEntity<>("User deleted", HttpStatus.OK);
     }
+
+
 }

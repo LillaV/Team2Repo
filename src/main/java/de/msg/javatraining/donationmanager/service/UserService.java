@@ -16,11 +16,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserService {
     @Autowired
     UserMapper userMapper;
@@ -91,7 +93,7 @@ public class UserService {
             userToSave.setUsername(serviceUtils.generateUsername(userToSave,factory.getUserRepository().findAll()));
             User user = factory.getUserRepository().save(userToSave);
             if(user != null) {
-                UserServiceUtils.sendSimpleMessage(user,password);
+                serviceUtils.sendSimpleMessage(user,password);
             }
         } else {
             System.out.println("Cannot save");

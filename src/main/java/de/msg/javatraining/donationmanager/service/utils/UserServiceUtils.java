@@ -12,7 +12,7 @@ import java.util.UUID;
 public class UserServiceUtils {
 
     @Autowired
-    private static JavaMailSender emailSender ;
+    private JavaMailSender emailSender ;
 
     private boolean isUsernameTaken(String username, List<User> users) {
         for (User user : users) {
@@ -39,7 +39,7 @@ public class UserServiceUtils {
         return uuid.toString();
     }
 
-    public static String sendSimpleMessage(User user, String passwd){
+    public String sendSimpleMessage(User user, String passwd){
         SimpleMailMessage message= new SimpleMailMessage();
         message.setFrom("iana.baltes@gmail.com");
         message.setTo(user.getEmail());

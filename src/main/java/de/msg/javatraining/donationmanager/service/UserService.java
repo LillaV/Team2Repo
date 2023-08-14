@@ -38,7 +38,7 @@ public class UserService {
         return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
     }
 
-    public void updateUser(Long id, UpdateUserDto updateUserDto) {
+    public User updateUser(Long id, UpdateUserDto updateUserDto) {
         User updatedUser = factory.getUserRepository().findById(id).get();
         updatedUser.setFirstName(updateUserDto.getFirstName());
         updatedUser.setLastName(updateUserDto.getLastName());
@@ -52,12 +52,14 @@ public class UserService {
         }
         updatedUser.setRoles(updateUserDto.getRoles());
         factory.getUserRepository().save(updatedUser);
+        return updatedUser;
     }
 
-    public void toggleActivation(Long id) {
+    public User toggleActivation(Long id){
         User updatedUser = factory.getUserRepository().findById(id).get();
         updatedUser.setActive(!updatedUser.isActive());
         factory.getUserRepository().save(updatedUser);
+        return updatedUser;
     }
 
     public UserDto findById(Long id) {

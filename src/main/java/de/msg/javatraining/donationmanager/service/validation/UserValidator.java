@@ -34,7 +34,7 @@ public class UserValidator {
 
     public static boolean userValidation(User user) {
         return containsOnlyLetters(user.getFirstName()) && containsOnlyLetters(user.getLastName())
-                && isValidEmail(user.getEmail()) && validPhoneNumber(user.getPhoneNumber());
+                && isValidEmail(user.getEmail()) && validPhoneNumber(user.getMobileNumber());
     }
 
 }

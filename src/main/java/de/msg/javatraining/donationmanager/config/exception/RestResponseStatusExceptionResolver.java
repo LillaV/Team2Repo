@@ -2,6 +2,8 @@ package de.msg.javatraining.donationmanager.config.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -13,6 +15,23 @@ public class RestResponseStatusExceptionResolver {
     private ResponseEntity<String> handleUniqueConstraintViolation(SQLIntegrityConstraintViolationException ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = {InvalidRefreshTokenException.class})
+    private  ResponseEntity<String> handleInvalidRefreshToken(InvalidRefreshTokenException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({UsernameNotFoundException.class})
+    private ResponseEntity<String> handleUsernameNotFoundException(Exception exception){
+        return new ResponseEntity<String>("bad username",HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({BadCredentialsException.class})
+    private ResponseEntity<String> handleBadPasswordException(Exception exception){
+        return new ResponseEntity<String>("bad password",HttpStatus.UNAUTHORIZED);
+    }
+
+
 
 
 }

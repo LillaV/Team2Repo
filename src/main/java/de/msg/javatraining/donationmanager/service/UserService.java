@@ -54,6 +54,13 @@ public class UserService {
         factory.getUserRepository().save(updatedUser);
     }
 
+    public void firstLogin(Long id, UpdateUserDto updateUserDto){
+        User updatedUser=factory.getUserRepository().findById(id).get();
+        updatedUser.setPassword(updateUserDto.getPassword());
+        updatedUser.setNewUser(false);
+        factory.getUserRepository().save(updatedUser);
+    }
+
     public void toggleActivation(Long id){
         User updatedUser = factory.getUserRepository().findById(id).get();
         updatedUser.setActive(!updatedUser.isActive());

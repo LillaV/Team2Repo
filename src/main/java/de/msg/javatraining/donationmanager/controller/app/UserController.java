@@ -42,6 +42,15 @@ public class UserController {
         }
 
     }
+    @PutMapping("/firstLogin")
+    public ResponseEntity firstLoginChanges(@PathVariable("id") Long id,@RequestBody UpdateUserDto user){
+        try{
+            userService.firstLogin(id,user);
+            return new ResponseEntity<>("User updated", HttpStatus.OK);
+        }catch (Exception exception){
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        }
+    }
 
     @PutMapping("/{id}/activation")
     public ResponseEntity toggleActivation(@PathVariable("id") Long id) {

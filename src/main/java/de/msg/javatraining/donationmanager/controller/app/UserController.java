@@ -35,7 +35,7 @@ public class UserController {
     public ResponseEntity<String> saveUser(@RequestBody CreateUserDto user) {
         try{
             userService.saveUser(user);
-            return new ResponseEntity<>("User saved", HttpStatus.OK);
+            return new ResponseEntity<>("Validation in progress...", HttpStatus.OK);
         }
         catch (Exception exception){
             return ResponseEntity.badRequest().body(exception.getMessage());

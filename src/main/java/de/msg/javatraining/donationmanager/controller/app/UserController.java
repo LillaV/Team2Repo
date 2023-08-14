@@ -36,7 +36,7 @@ public class UserController {
 //        userService.saveUser(user);
 //        return new ResponseEntity<>("User saved", HttpStatus.OK);
 //    }
-    @PostMapping("/users")
+    @PostMapping()
     public ResponseEntity<String> saveUser(@RequestBody CreateUserDto user) {
         try{
             userService.saveUser(user);
@@ -48,13 +48,19 @@ public class UserController {
 
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity UpdateUser(@RequestBody() UpdateUserDto user, @PathVariable("id") Long id) {
+    @PutMapping("/{id}")
+    public ResponseEntity updateUser(@RequestBody() UpdateUserDto user, @PathVariable("id") Long id) {
         userService.updateUser(id, user);
         return new ResponseEntity<>( HttpStatus.OK);
     }
 
-    @DeleteMapping("{id}")
+    @PutMapping("/{id}/activation")
+    public ResponseEntity toggleActivation(@PathVariable("id") Long id) {
+        userService.toggleActivation(id);
+        return new ResponseEntity<>( HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id) {
         userService.deleteUserById(id);
         return new ResponseEntity<>("User deleted", HttpStatus.OK);

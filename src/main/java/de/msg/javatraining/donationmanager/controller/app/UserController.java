@@ -3,6 +3,7 @@ package de.msg.javatraining.donationmanager.controller.app;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
+import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.UserDetailsServiceImpl;
 import de.msg.javatraining.donationmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +56,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}/activation")
-    public ResponseEntity toggleActivation(@PathVariable("id") Long id) {
-        userService.toggleActivation(id);
-        return new ResponseEntity<>( HttpStatus.OK);
+    public ResponseEntity<User> toggleActivation(@PathVariable("id") Long id) {
+        User updatedUser = userService.toggleActivation(id);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/{id}")

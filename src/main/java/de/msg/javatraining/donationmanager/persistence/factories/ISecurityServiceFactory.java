@@ -4,7 +4,7 @@ import de.msg.javatraining.donationmanager.persistence.repository.RefreshTokenRe
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
 
 public interface ISecurityServiceFactory {
-    public UserRepository getUserRepository();
-    public RefreshTokenRepository getRefreshTokenRepository();
+    UserRepository getUserRepository();
+    RefreshTokenRepository getRefreshTokenRepository();
 
 }

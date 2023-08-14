@@ -10,7 +10,7 @@ public class UserValidator {
         // Define a regular expression pattern that matches only letters (A-Z, a-z)
         Pattern pattern = Pattern.compile("^[a-zA-Z]+$");
         Matcher matcher = pattern.matcher(input);
-        System.out.println("For lastname and firstName  the matcher returns" + matcher.matches());
+        System.out.println("For lastname and firstName the matcher returns" + matcher.matches());
         return matcher.matches();
     }
 

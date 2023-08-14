@@ -35,6 +35,7 @@ public class Donation {
     private User approvedBy;
     @ManyToOne
     private Campaign campaign;
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "donation")
-    private Set<Donator> benefactor;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "donator_id")
+    private Donator benefactor;
 }

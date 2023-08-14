@@ -5,8 +5,8 @@ import de.msg.javatraining.donationmanager.persistence.repository.RoleRepository
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
 
 public interface IUserServiceFactory{
-    public UserRepository getUserRepository();
-    public RoleRepository getRoleRepository();
-    public  CampaignRepository getCampaignRepository();
+    UserRepository getUserRepository();
+    RoleRepository getRoleRepository();
+    CampaignRepository getCampaignRepository();
 
 }

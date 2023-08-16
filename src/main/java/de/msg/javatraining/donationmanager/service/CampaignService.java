@@ -22,4 +22,11 @@ public class CampaignService{
         campaignRepository.save(campaignToSave);
     }
 
+    public void updateCampaign(Long id, CampaignDto campaignDto){
+        Campaign campaignToSave=campaignRepository.findById(id).get();
+        campaignToSave.setName(campaignDto.getName());
+        campaignToSave.setPurpose(campaignDto.getPurpose());
+        campaignRepository.save(campaignToSave);
+    }
+
 }

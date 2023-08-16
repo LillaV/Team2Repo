@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,10 +46,6 @@ public class UserService {
         updatedUser.setNewUser(updateUserDto.isNewUser());
         updatedUser.setEmail(updateUserDto.getEmail());
         updatedUser.setMobileNumber(updateUserDto.getMobileNumber());
-        updatedUser.setCampaigns(updateUserDto.getCampaigns());
-        if (updateUserDto.getPassword() != null) {
-            updatedUser.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
-        }
         updatedUser.setRoles(updateUserDto.getRoles());
         factory.getUserRepository().save(updatedUser);
         return updatedUser;

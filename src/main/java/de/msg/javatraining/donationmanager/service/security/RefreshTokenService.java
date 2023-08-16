@@ -40,7 +40,7 @@ public class RefreshTokenService {
     }
 
     public void deleteRefreshTokenForUser(Long userId) {
-        factory.getRefreshTokenRepository().deleteRefreshTokenFromUser(userId);
+        factory.getRefreshTokenRepository().deleteRefreshTokenByUser(userId);
     }
 
 }

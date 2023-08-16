@@ -19,6 +19,7 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private Boolean active;
+    private Boolean newUser;
     private String email;
     private String mobileNumber;
     private Set<Role> roles = new HashSet<>();

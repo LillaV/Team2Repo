@@ -33,7 +33,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
             try {
                 String jwt = parseJwt(request);
-                //check if jwt is valid, if it is valid get the userdetails and set the authenticationcontext
                 if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                     String username = jwtUtils.getUserNameFromJwtToken(jwt);
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);

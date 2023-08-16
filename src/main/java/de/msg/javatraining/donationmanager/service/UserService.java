@@ -2,6 +2,7 @@ package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.UserMapper;
@@ -53,6 +54,13 @@ public class UserService {
         updatedUser.setRoles(updateUserDto.getRoles());
         factory.getUserRepository().save(updatedUser);
         return updatedUser;
+    }
+
+    public void firstLogin(Long id, FirstLoginDto pd){
+        User updatedUser=factory.getUserRepository().findById(id).get();
+        updatedUser.setPassword(passwordEncoder.encode(pd.getPassword()));
+        updatedUser.setNewUser(false);
+        factory.getUserRepository().save(updatedUser);
     }
 
     public User toggleActivation(Long id){

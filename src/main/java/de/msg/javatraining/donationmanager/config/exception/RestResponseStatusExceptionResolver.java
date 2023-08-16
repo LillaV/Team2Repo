@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.config.exception;
 
+import org.hibernate.PropertyValueException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,7 +32,10 @@ public class RestResponseStatusExceptionResolver {
         return new ResponseEntity<String>("bad password",HttpStatus.UNAUTHORIZED);
     }
 
-
+    @ExceptionHandler({PropertyValueException.class})
+    private ResponseEntity<String> handlePropertyValueException(Exception exception){
+        return new ResponseEntity<String>("bad request",HttpStatus.BAD_REQUEST);
+    }
 
 
 }

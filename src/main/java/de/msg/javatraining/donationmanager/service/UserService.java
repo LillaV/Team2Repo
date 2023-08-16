@@ -2,6 +2,7 @@ package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.UserMapper;
@@ -33,8 +34,8 @@ public class UserService {
     @Autowired
     IUserServiceFactory factory;
 
-    public List<UserDto> allUsersWithPagination(int offset, int pageSize){
-        Page<User> users =  factory.getUserRepository().findAll(PageRequest.of(offset, pageSize));
+    public List<UserDto> allUsersWithPagination(int offset, int pageSize) {
+        Page<User> users = factory.getUserRepository().findAll(PageRequest.of(offset, pageSize));
         return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
     }
 
@@ -55,6 +56,13 @@ public class UserService {
         return updatedUser;
     }
 
+    public void firstLogin(Long id, FirstLoginDto pd){
+        User updatedUser=factory.getUserRepository().findById(id).get();
+        updatedUser.setPassword(passwordEncoder.encode(pd.getPassword()));
+        updatedUser.setNewUser(false);
+        factory.getUserRepository().save(updatedUser);
+    }
+
     public User toggleActivation(Long id){
         User updatedUser = factory.getUserRepository().findById(id).get();
         updatedUser.setActive(!updatedUser.isActive());
@@ -72,32 +80,38 @@ public class UserService {
     }
 
     public void saveUser(CreateUserDto userDto) {
-        Set<Role> roles = new HashSet<>();
-        Set<Campaign> campaigns = new HashSet<>();
-        for (long id : userDto.getRolesIDs()) {
-            Optional<Role> role = factory.getRoleRepository().findById(id);
-            if (role.isPresent()) {
-                roles.add(role.get());
+        if (userDto.getRolesIDs().size() != 0) {
+            Set<Role> roles = new HashSet<>();
+            Set<Campaign> campaigns = new HashSet<>();
+            for (long id : userDto.getRolesIDs()) {
+                Optional<Role> role = factory.getRoleRepository().findById(id);
+                if (role.isPresent()) {
+                    roles.add(role.get());
+                }
             }
-        }
-        for (long id : userDto.getCampaignIDs()) {
-            Optional<Campaign> campaign = factory.getCampaignRepository().findById(id);
-            if (campaign.isPresent()) {
-                campaigns.add(campaign.get());
+            for (long id : userDto.getCampaignIDs()) {
+                Optional<Campaign> campaign = factory.getCampaignRepository().findById(id);
+                if (campaign.isPresent()) {
+                    campaigns.add(campaign.get());
+                }
             }
-        }
-        User userToSave = CreateUserMapper.createUserDtoToUser(userDto, roles, campaigns);
-        String password = UserServiceUtils.generateUUID();
-        userToSave.setPassword(password);
-        if (UserValidator.userValidation(userToSave)) {
-            userToSave.setUsername(serviceUtils.generateUsername(userToSave,factory.getUserRepository().findAll()));
-            User user = factory.getUserRepository().save(userToSave);
-            if(user != null) {
-                serviceUtils.sendSimpleMessage(user,password);
-            }
-        } else {
-            System.out.println("Cannot save");
-        }
+            User userToSave = CreateUserMapper.createUserDtoToUser(userDto, roles, campaigns);
+            String password = UserServiceUtils.generateUUID();
+            userToSave.setPassword(password);
+            if (UserValidator.userValidation(userToSave)) {
+                userToSave.setUsername(serviceUtils.generateUsername(userToSave, factory.getUserRepository().findAll()));
+                User user = factory.getUserRepository().save(userToSave);
+                if (user != null) {
+                    serviceUtils.sendSimpleMessage(user, password);
+                }
 
+            } else {
+                System.out.println("Cannot save");
+            }
+
+        } else {
+            System.out.println("Cannot save, user must have at least 1 role");
+        }
     }
 }
+

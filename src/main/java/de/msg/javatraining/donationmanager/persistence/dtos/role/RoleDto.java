@@ -15,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoleDto {
+    private Integer id;
     private ERole name;
     private Set<Permission> permissions= new HashSet<>();
 

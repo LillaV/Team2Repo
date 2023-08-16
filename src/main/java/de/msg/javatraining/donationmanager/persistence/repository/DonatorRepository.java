@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DonatorRepository extends JpaRepository<Donator,Long> {
+    boolean existsByFirstNameAndLastNameAndAdditionalNameAndMaidenName(
+            String firstName, String lastName, String additionalName, String maidenName);
 }

@@ -43,7 +43,11 @@ public class DonatorService {
     }
 
     public void deleteDonatorById(Long id) {
-        factory.getDonatorRepository().deleteById(id);
+        if(factory.getDonationRepository().existsByBenefactorId(id)){
+            setToUnknown(id);
+        } else {
+            factory.getDonatorRepository().deleteById(id);
+        }
     }
 
     public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
@@ -55,9 +59,7 @@ public class DonatorService {
         }
     }
 
-    // TODO
     public void setToUnknown(Long id){
-        Optional<Donator> donator = factory.getDonatorRepository().findById(id);
-
+        updateDonator(id, new SimpleDonatorDto("Unknown", "Unknown", "Unknown", "Unknown"));
     }
 }

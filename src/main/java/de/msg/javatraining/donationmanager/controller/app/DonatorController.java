@@ -44,8 +44,6 @@ public class DonatorController {
         return new ResponseEntity<>( HttpStatus.OK);
     }
 
-
-    // TODO:
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDonatorById(@PathVariable("id") Long id) {
         donatorService.deleteDonatorById(id);

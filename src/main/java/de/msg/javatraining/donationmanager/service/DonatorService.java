@@ -50,14 +50,31 @@ public class DonatorService {
         }
     }
 
-    public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
-        Donator donator = donatorMapper.SimpleDonatorDtoToDonator(simpleDonatorDto);
+//    public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
+//        Donator donator = donatorMapper.SimpleDonatorDtoToDonator(simpleDonatorDto);
+//        if (DonatorValidator.donatorValidation(donator)) {
+//            factory.getDonatorRepository().save(donator);
+//        } else {
+//            System.out.println("Cannot save");
+//        }
+//    }
+public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
+    Donator donator = donatorMapper.SimpleDonatorDtoToDonator(simpleDonatorDto);
+
+    // Check if the donator already exists based on first name, last name, additional name, and maiden name
+    if (!factory.getDonatorRepository().existsByFirstNameAndLastNameAndAdditionalNameAndMaidenName(
+            donator.getFirstName(), donator.getLastName(), donator.getAdditionalName(), donator.getMaidenName())) {
         if (DonatorValidator.donatorValidation(donator)) {
             factory.getDonatorRepository().save(donator);
         } else {
             System.out.println("Cannot save");
         }
+    } else {
+        System.out.println("Donator already exists");
     }
+}
+
+
 
     public void setToUnknown(Long id){
         updateDonator(id, new SimpleDonatorDto("Unknown", "Unknown", "Unknown", "Unknown"));

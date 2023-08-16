@@ -30,13 +30,14 @@ public class DonatorController {
     public ResponseEntity<String> saveDonator(@RequestBody SimpleDonatorDto donator) {
         try{
             donatorService.saveDonator(donator);
-            return new ResponseEntity<>("Donator saved", HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception exception){
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
 
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity updateDonator(@RequestBody() SimpleDonatorDto donator, @PathVariable("id") Long id) {

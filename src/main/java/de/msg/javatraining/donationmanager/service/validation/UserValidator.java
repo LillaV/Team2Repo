@@ -10,7 +10,7 @@ public class UserValidator {
         // Define a regular expression pattern that matches only letters (A-Z, a-z)
         Pattern pattern = Pattern.compile("^[a-zA-Z]+$");
         Matcher matcher = pattern.matcher(input);
-        System.out.println("For lastname and firstName  the matcher returns" + matcher.matches());
+        System.out.println("For lastname and firstName the matcher returns" + matcher.matches());
         return matcher.matches();
     }
 
@@ -25,7 +25,8 @@ public class UserValidator {
 
     private static boolean isValidEmail(String email) {
         // Define a regular expression pattern for basic email validation
-        String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
+//        String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        String regex="^[A-Za-z0-9+_.-]+@[^@]+\\.[A-Za-z]{2,}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
         System.out.println("For email returns" + matcher.matches());

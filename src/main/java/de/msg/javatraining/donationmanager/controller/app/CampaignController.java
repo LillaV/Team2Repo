@@ -9,12 +9,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/campaigns")
 public class CampaignController {
 
     @Autowired
     private CampaignService campaignService;
+    @GetMapping()
+    public List<CampaignDto> getCampaigns(){
+        return campaignService.getCampaigns();
+    }
 
     @PostMapping()
     public ResponseEntity<String> saveCampaign(@RequestBody CampaignDto campaignDto) {

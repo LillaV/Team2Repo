@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class CampaignService{
@@ -16,6 +19,11 @@ public class CampaignService{
 
     @Autowired
     private CampaignMapper campaignMapper;
+
+    public List<CampaignDto> getCampaigns(){
+        List<Campaign> campaigns=campaignRepository.findAll();
+        return campaigns.stream().map(campaign -> campaignMapper.campaignToCampaignDto(campaign)).collect(Collectors.toList());
+    }
 
     public void saveCampaign(CampaignDto campaignDto){
         Campaign campaignToSave=campaignMapper.campaignDtoToCampaign(campaignDto);

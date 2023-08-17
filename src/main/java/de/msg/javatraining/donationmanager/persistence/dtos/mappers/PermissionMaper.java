@@ -5,6 +5,8 @@ import de.msg.javatraining.donationmanager.persistence.model.Permission;
 import org.mapstruct.Mapper;
 
 @Mapper
-public interface PermisssionMaper {
+public interface PermissionMaper {
     Permission permisssionDTOToPermission(PermissionDTO permissionDTO);
+    PermissionDTO permissionToPermissionDTO(Permission permission);
 }
+

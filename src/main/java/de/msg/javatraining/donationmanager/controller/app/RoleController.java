@@ -1,8 +1,8 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.permission.PermissionDTO;
+import de.msg.javatraining.donationmanager.persistence.dtos.permission.RolePermissionsDTO;
 import de.msg.javatraining.donationmanager.persistence.dtos.role.RoleDto;
-import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,9 +23,20 @@ public class RoleController {
         return roleService.findAll();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> acordPermissions(@PathVariable("id") Long roleId, @RequestBody Set<PermissionDTO> permissionDTOS){
-        this.roleService.addPermission(permissionDTOS,roleId);
-        return new ResponseEntity<>("Permisssion accorded", HttpStatus.OK);
+    @PutMapping("add/{id}")
+    public ResponseEntity<String> accordPermissions(@PathVariable("id") Long roleId, @RequestBody Set<PermissionDTO> permissionDTOS){
+        String message =this.roleService.addPermission(permissionDTOS,roleId);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @GetMapping("/permissions/{id}")
+    public List<RolePermissionsDTO> getPermissions(@PathVariable(name = "id") Long id){
+        return  this.roleService.getPermissions(id);
+    }
+
+    @PutMapping("remove/{id}")
+    public  ResponseEntity<String> removePermissions(@PathVariable("id") Long roleId,@RequestBody Set<PermissionDTO> permissionDTOS){
+        String message = this.roleService.removePermissions(permissionDTOS,roleId);
+        return new ResponseEntity<>(message,HttpStatus.OK);
     }
 }

@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.config.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.PropertyValueException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +33,25 @@ public class RestResponseStatusExceptionResolver {
         return new ResponseEntity<String>("bad password",HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler({RoleNotFoundException.class})
+    private ResponseEntity<String> handleBadPasswordException(RoleNotFoundException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({UserNotFoundException.class})
+    private ResponseEntity<String> handleBadPasswordException(UserNotFoundException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+
     @ExceptionHandler({PropertyValueException.class})
     private ResponseEntity<String> handlePropertyValueException(Exception exception){
         return new ResponseEntity<String>("bad request",HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({EntityNotFoundException.class})
+    private ResponseEntity<String> handlePropertyValueException(EntityNotFoundException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
 

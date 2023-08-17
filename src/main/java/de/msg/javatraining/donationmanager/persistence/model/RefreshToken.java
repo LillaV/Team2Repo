@@ -13,6 +13,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "refreshToken")
 public class RefreshToken {
     @Id
     private String refreshToken;

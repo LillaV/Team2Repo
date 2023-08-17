@@ -37,7 +37,6 @@ public class UserController {
         catch (Exception exception){
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
-
     }
     @PutMapping("/{id}/firstLogin")
     public ResponseEntity firstLoginChanges(@PathVariable("id") Long id,@RequestBody FirstLoginDto password){

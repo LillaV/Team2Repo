@@ -37,4 +37,9 @@ public class CampaignService{
         campaignRepository.save(campaignToSave);
     }
 
+    public CampaignDto findById(Long id){
+        Campaign campaignToFind=campaignRepository.findById(id).get();
+        return campaignMapper.campaignToCampaignDto(campaignToFind);
+    }
+
 }

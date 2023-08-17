@@ -44,4 +44,9 @@ public class CampaignController {
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
     }
+
+    @GetMapping("{id}")
+    public CampaignDto findCampaignById(@PathVariable(name = "id") Long id){
+        return campaignService.findById(id);
+    }
 }

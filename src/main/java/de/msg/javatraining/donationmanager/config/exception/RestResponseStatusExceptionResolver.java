@@ -41,4 +41,9 @@ public class RestResponseStatusExceptionResolver {
     private ResponseEntity<String> handleInvalidDonationException(Exception exception){
         return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler({DonatorNotFoundException.class})
+    private ResponseEntity<String> handleBadPasswordException(DonatorNotFoundException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+    }
 }

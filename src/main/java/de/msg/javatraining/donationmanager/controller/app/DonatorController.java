@@ -35,7 +35,11 @@ public class DonatorController {
         catch (Exception exception){
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
+    }
 
+    @GetMapping("{id}")
+    public Donator getDonatorById(@PathVariable(name = "id") Long id){
+        return  donatorService.findById(id);
     }
 
 

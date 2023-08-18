@@ -65,9 +65,8 @@ public class UserService {
         return updatedUser;
     }
 
-    public UserDto findById(Long id) {
-        User userToFind = factory.getUserRepository().findById(id).get();
-        return userMapper.userToUserDto(userToFind);
+    public User findById(Long id) {
+        return factory.getUserRepository().findById(id).get();
     }
 
     public void deleteUserById(Long id) {

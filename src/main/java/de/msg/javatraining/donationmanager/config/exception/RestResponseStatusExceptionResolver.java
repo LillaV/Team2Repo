@@ -45,5 +45,8 @@ public class RestResponseStatusExceptionResolver {
         return new ResponseEntity<String>("bad request",HttpStatus.BAD_REQUEST);
     }
 
-
+    @ExceptionHandler({InvalidDonationException.class})
+    private ResponseEntity<String> handleInvalidDonationException(Exception exception){
+        return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

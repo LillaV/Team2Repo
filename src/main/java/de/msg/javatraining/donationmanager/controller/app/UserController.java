@@ -4,6 +4,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
+import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("{id}")
-    public UserDto getUserById(@PathVariable(name = "id") Long id){
+    public User getUserById(@PathVariable(name = "id") Long id){
         return  userService.findById(id);
     }
 

@@ -27,9 +27,9 @@ public class DonatorService {
 
     @Autowired
     DonatorMapper donatorMapper;
-    public List<SimpleDonatorDto> allDonatorsWithPagination(int offset, int pageSize){
+    public List<Donator> allDonatorsWithPagination(int offset, int pageSize){
         Page<Donator> donators =  factory.getDonatorRepository().findAll(PageRequest.of(offset, pageSize));
-        return donators.stream().map(donator -> donatorMapper.donatorToSimpleDonatorDto(donator)).collect(Collectors.toList());
+        return donators.stream().collect(Collectors.toList());
     }
 
     public Donator updateDonator(Long id, SimpleDonatorDto simpleDonatorDto) {

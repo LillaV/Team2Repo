@@ -22,7 +22,7 @@ public class DonatorController {
     private DonatorService donatorService;
 
     @GetMapping("/{offset}/{pageSize}")
-    public List<SimpleDonatorDto> getPage(@PathVariable(name = "offset") int offset, @PathVariable(name = "pageSize") int pageSize) {
+    public List<Donator> getPage(@PathVariable(name = "offset") int offset, @PathVariable(name = "pageSize") int pageSize) {
         return donatorService.allDonatorsWithPagination(offset, pageSize);
     }
 

@@ -42,9 +42,9 @@ public class DonationService {
     @Autowired
     DonationMapper donationMapper;
 
-    public List<SimpleDonationDto> allDonationsWithPagination(int offset, int pageSize){
+    public List<Donation> allDonationsWithPagination(int offset, int pageSize){
         Page<Donation> donations =  factory.getDonationRepository().findAll(PageRequest.of(offset, pageSize));
-        return donations.stream().map(donation -> donationMapper.donationToSimpleDonationDto(donation)).collect(Collectors.toList());
+        return donations.stream().collect(Collectors.toList());
     }
 
     public Donation findById(Long id) {

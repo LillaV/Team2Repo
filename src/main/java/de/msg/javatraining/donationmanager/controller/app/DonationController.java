@@ -33,11 +33,17 @@ public class DonationController {
 //    }
 
     @GetMapping()
-    public List<SimpleDonationDto> getPage(
+    public List<Donation> getPage(
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "pageSize") int pageSize) {
         return donationService.allDonationsWithPagination(offset, pageSize);
     }
+
+    @GetMapping("/{id}")
+    public Donation findDonationById(@PathVariable(name = "id") Long id){
+        return donationService.findById(id);
+    }
+
 
 
     @PostMapping()
@@ -86,7 +92,6 @@ public class DonationController {
     @GetMapping("/filter")
     public List<SimpleDonationDto> filterDonations(
             @RequestParam(name = "minValue", required = false) Float minValue,
-//            @RequestParam(name = "minValue", defaultValue = "0.0") Float minValue,
             @RequestParam(name = "maxValue", required = false) Float maxValue,
             @RequestParam(name = "value", required = false) Float value,
             @RequestParam(name = "currency", required = false) String currency,

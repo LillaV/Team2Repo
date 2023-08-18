@@ -2,6 +2,7 @@ package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CampaignMapper;
+import de.msg.javatraining.donationmanager.persistence.factories.IDonationServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.repository.CampaignRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ import java.util.stream.Collectors;
 public class CampaignService{
     @Autowired
     private CampaignRepository campaignRepository;
+
+    @Autowired
+    IDonationServiceFactory factory;
 
     @Autowired
     private CampaignMapper campaignMapper;
@@ -40,6 +44,15 @@ public class CampaignService{
     public CampaignDto findById(Long id){
         Campaign campaignToFind=campaignRepository.findById(id).get();
         return campaignMapper.campaignToCampaignDto(campaignToFind);
+    }
+
+    public void deleteCampaignById(Long id){
+        Campaign campaignToFind=campaignRepository.findById(id).get();
+        if(factory.getDonationRepository().existsByCampaignAndApprovedTrue(campaignToFind)){
+            throw new RuntimeException("Not allowed to delete");
+        }else {
+            campaignRepository.deleteById(id);
+        }
     }
 
 }

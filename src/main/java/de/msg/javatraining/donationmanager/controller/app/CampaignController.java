@@ -49,4 +49,15 @@ public class CampaignController {
     public CampaignDto findCampaignById(@PathVariable(name = "id") Long id){
         return campaignService.findById(id);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteCampaignById(@PathVariable(name = "id") Long id){
+        try{
+            campaignService.deleteCampaignById(id);
+            return new ResponseEntity<>("Campaign deleted", HttpStatus.OK);
+        }
+        catch (Exception exception){
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        }
+    }
 }

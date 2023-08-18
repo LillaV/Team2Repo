@@ -2,6 +2,7 @@ package de.msg.javatraining.donationmanager.controller.auth;
 
 
 import de.msg.javatraining.donationmanager.config.security.JwtUtils;
+import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.repository.RoleRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
 import de.msg.javatraining.donationmanager.service.security.RefreshTokenService;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,24 +63,51 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
 
-    Authentication authentication = authenticationManager
-        .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+    try{
+      Authentication authentication = authenticationManager
+              .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-    SecurityContextHolder.getContext().setAuthentication(authentication);
+      SecurityContextHolder.getContext().setAuthentication(authentication);
 
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+      UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    String jwt = jwtUtils.generateJwtToken(userDetails);
+      User user = this.userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
 
-    List<String> permissions = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-        .collect(Collectors.toList());
+//      if(!user.isActive()){
+//      }
 
-    String refreshToken = UUID.randomUUID().toString();
-    refreshTokenService.deleteRefreshTokenForUser(userDetails.getId());
-    refreshTokenService.createRefreshToken(refreshToken, userDetails.getId());
-    HttpHeaders headers = new HttpHeaders();
-    headers.add(HttpHeaders.SET_COOKIE, createCookie(refreshToken).toString());
-    return new ResponseEntity<>(new SignInResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), permissions,userDetails.isNewUser(),userDetails.isEnabled()), headers, HttpStatus.OK);
+      String jwt = jwtUtils.generateJwtToken(userDetails);
+
+      List<String> permissions = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
+              .collect(Collectors.toList());
+
+      String refreshToken = UUID.randomUUID().toString();
+      refreshTokenService.deleteRefreshTokenForUser(userDetails.getId());
+      refreshTokenService.createRefreshToken(refreshToken, userDetails.getId());
+      HttpHeaders headers = new HttpHeaders();
+
+      user.setFailedLoginAttempts(0);
+      headers.add(HttpHeaders.SET_COOKIE, createCookie(refreshToken).toString());
+      return new ResponseEntity<>(new SignInResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), permissions,userDetails.isNewUser(),userDetails.isEnabled()), headers, HttpStatus.OK);
+    }
+    catch (BadCredentialsException e){
+        User user = this.userRepository.findByUsername(loginRequest.getUsername()).orElseThrow();
+        user.setFailedLoginAttempts(user.getFailedLoginAttempts()+1);
+
+        if(user.getFailedLoginAttempts() >= 5){
+            user.setActive(false);
+            user.setFailedLoginAttempts(0);
+            this.userRepository.save(user);
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Your account is currently deactivated!");
+
+        }
+
+        this.userRepository.save(user);
+
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.UNAUTHORIZED);
+    }
+
   }
 
   @GetMapping("/refreshToken")

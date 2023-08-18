@@ -107,5 +107,6 @@ public class UserService {
             System.out.println("Cannot save, user must have at least 1 role");
         }
     }
+
 }
 

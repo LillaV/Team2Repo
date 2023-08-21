@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -34,7 +37,15 @@ public class Donation {
     @JoinColumn(name = "auser_id")
     private User approvedBy;
 //    @ManyToOne(cascade = CascadeType.PERSIST)
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(
+            name = "campaign_id",
+            nullable = false,
+            foreignKey = @ForeignKey(
+                    name = "FK_CAMPAIGN_ID",
+                    foreignKeyDefinition = "FOREIGN KEY (campaign_id) REFERENCES campaign(id) ON DELETE CASCADE"
+            )
+    )
     private Campaign campaign;
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @ManyToOne(cascade = CascadeType.PERSIST)

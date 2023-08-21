@@ -32,6 +32,11 @@ public class DonationController {
 //        return donationService.allDonationsWithPagination(offset, pageSize);
 //    }
 
+    @GetMapping("/currencies")
+    public List<String> getCurrencies(){
+        return donationService.getCurrencies();
+    }
+
     @GetMapping()
     public List<Donation> getPage(
             @RequestParam(name = "offset") int offset,

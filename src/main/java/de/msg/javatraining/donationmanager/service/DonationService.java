@@ -5,6 +5,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonat
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonationMapper;
 import de.msg.javatraining.donationmanager.persistence.factories.IDonationServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
+import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.validation.DonationValidator;
@@ -93,4 +94,11 @@ public class DonationService {
         return factory.getDonationRepository().getDistinctCurrencies();
     }
 
+    public List<Campaign> getCampaigns(){
+        return factory.getCampaignRepository().findAll();
+    }
+
+    public List<User> getUsers(){
+        return factory.getUserRepository().findAll();
+    }
 }

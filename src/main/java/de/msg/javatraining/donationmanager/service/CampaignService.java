@@ -2,11 +2,15 @@ package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CampaignMapper;
+import de.msg.javatraining.donationmanager.persistence.factories.IDonationServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.repository.CampaignRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -15,7 +19,15 @@ public class CampaignService{
     private CampaignRepository campaignRepository;
 
     @Autowired
+    IDonationServiceFactory factory;
+
+    @Autowired
     private CampaignMapper campaignMapper;
+
+    public List<CampaignDto> getCampaigns(){
+        List<Campaign> campaigns=campaignRepository.findAll();
+        return campaigns.stream().map(campaign -> campaignMapper.campaignToCampaignDto(campaign)).collect(Collectors.toList());
+    }
 
     public void saveCampaign(CampaignDto campaignDto){
         Campaign campaignToSave=campaignMapper.campaignDtoToCampaign(campaignDto);
@@ -27,6 +39,20 @@ public class CampaignService{
         campaignToSave.setName(campaignDto.getName());
         campaignToSave.setPurpose(campaignDto.getPurpose());
         campaignRepository.save(campaignToSave);
+    }
+
+    public CampaignDto findById(Long id){
+        Campaign campaignToFind=campaignRepository.findById(id).get();
+        return campaignMapper.campaignToCampaignDto(campaignToFind);
+    }
+
+    public void deleteCampaignById(Long id){
+        Campaign campaignToFind=campaignRepository.findById(id).get();
+        if(factory.getDonationRepository().existsByCampaignAndApprovedTrue(campaignToFind)){
+            throw new RuntimeException("Not allowed to delete");
+        }else {
+            campaignRepository.deleteById(id);
+        }
     }
 
 }

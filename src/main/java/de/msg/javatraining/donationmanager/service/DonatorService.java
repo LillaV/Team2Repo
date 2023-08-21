@@ -27,9 +27,12 @@ public class DonatorService {
 
     @Autowired
     DonatorMapper donatorMapper;
-    public List<SimpleDonatorDto> allDonatorsWithPagination(int offset, int pageSize){
+
+    @Autowired
+    DonatorValidator donatorValidator;
+    public List<Donator> allDonatorsWithPagination(int offset, int pageSize){
         Page<Donator> donators =  factory.getDonatorRepository().findAll(PageRequest.of(offset, pageSize));
-        return donators.stream().map(donator -> donatorMapper.donatorToSimpleDonatorDto(donator)).collect(Collectors.toList());
+        return donators.stream().collect(Collectors.toList());
     }
 
     public Donator updateDonator(Long id, SimpleDonatorDto simpleDonatorDto) {
@@ -64,7 +67,7 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
     // Check if the donator already exists based on first name, last name, additional name, and maiden name
     if (!factory.getDonatorRepository().existsByFirstNameAndLastNameAndAdditionalNameAndMaidenName(
             donator.getFirstName(), donator.getLastName(), donator.getAdditionalName(), donator.getMaidenName())) {
-        if (DonatorValidator.donatorValidation(donator)) {
+        if (donatorValidator.validate(donator)) {
             factory.getDonatorRepository().save(donator);
         } else {
             System.out.println("Cannot save");

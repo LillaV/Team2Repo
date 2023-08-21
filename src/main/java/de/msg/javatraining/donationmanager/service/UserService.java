@@ -32,6 +32,8 @@ public class UserService {
     UserServiceUtils serviceUtils;
     @Autowired
     IUserServiceFactory factory;
+    @Autowired
+    UserValidator userValidator;
 
     public List<UserDto> allUsersWithPagination(int offset, int pageSize) {
         Page<User> users = factory.getUserRepository().findAll(PageRequest.of(offset, pageSize));
@@ -47,7 +49,9 @@ public class UserService {
         updatedUser.setEmail(updateUserDto.getEmail());
         updatedUser.setMobileNumber(updateUserDto.getMobileNumber());
         updatedUser.setRoles(updateUserDto.getRoles());
-        factory.getUserRepository().save(updatedUser);
+        if(userValidator.validate(updatedUser)){
+            factory.getUserRepository().save(updatedUser);
+        }
         return updatedUser;
     }
 
@@ -92,7 +96,7 @@ public class UserService {
             User userToSave = CreateUserMapper.createUserDtoToUser(userDto, roles, campaigns);
             String password = UserServiceUtils.generateUUID();
             userToSave.setPassword(password);
-            if (UserValidator.userValidation(userToSave)) {
+            if (userValidator.validate(userToSave)) {
                 userToSave.setUsername(serviceUtils.generateUsername(userToSave, factory.getUserRepository().findAll()));
                 User user = factory.getUserRepository().save(userToSave);
                 if (user != null) {

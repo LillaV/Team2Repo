@@ -1,6 +1,9 @@
 package de.msg.javatraining.donationmanager.config.exception;
 
 import org.hibernate.PropertyValueException;
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,6 +17,11 @@ public class RestResponseStatusExceptionResolver {
 
     @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class})
     private ResponseEntity<String> handleUniqueConstraintViolation(SQLIntegrityConstraintViolationException ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = {ConstraintViolationException.class})
+    private ResponseEntity<String> handleSqlExceptionHandler(Exception ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
 

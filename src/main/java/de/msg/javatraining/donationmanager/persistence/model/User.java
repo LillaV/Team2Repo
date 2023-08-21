@@ -45,5 +45,8 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    private Integer failedLoginAttempts=0;
+
+
 
 }

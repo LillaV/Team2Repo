@@ -6,6 +6,7 @@ import de.msg.javatraining.donationmanager.persistence.factories.IDonatorService
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
+import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.validation.DonatorValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -76,6 +77,10 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
         System.out.println("Donator already exists");
     }
 }
+
+    public Donator findById(Long id) {
+        return factory.getDonatorRepository().findById(id).get();
+    }
 
 
 

@@ -18,8 +18,6 @@ public class DonationSpecifications {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            System.out.println(minValue + " " + maxValue);
-
             if (minValue != null && maxValue != null) {
                 predicates.add(criteriaBuilder.between(root.get("amount"), minValue, maxValue));
             } else if (minValue != null) {

@@ -95,7 +95,7 @@ public class UserService {
             }
             User userToSave = CreateUserMapper.createUserDtoToUser(userDto, roles, campaigns);
             String password = UserServiceUtils.generateUUID();
-            userToSave.setPassword(password);
+            userToSave.setPassword(passwordEncoder.encode(password));
             if (userValidator.validate(userToSave)) {
                 userToSave.setUsername(serviceUtils.generateUsername(userToSave, factory.getUserRepository().findAll()));
                 User user = factory.getUserRepository().save(userToSave);

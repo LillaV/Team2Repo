@@ -5,6 +5,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonat
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonationMapper;
 import de.msg.javatraining.donationmanager.persistence.factories.IDonationServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
+import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.validation.DonationValidator;
@@ -25,9 +26,6 @@ import java.util.stream.Collectors;
 public class DonationService {
     @Autowired
     IDonationServiceFactory factory;
-
-    @Autowired
-    IUserServiceFactory userFactory;
 
     @Autowired
     DonationMapper donationMapper;

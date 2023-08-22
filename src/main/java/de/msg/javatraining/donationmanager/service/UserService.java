@@ -40,6 +40,11 @@ public class UserService {
         return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
     }
 
+    public List<UserDto> getAllUsers(){
+        List<User> users = factory.getUserRepository().findAll();
+        return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
+    }
+
     public User updateUser(Long id, UpdateUserDto updateUserDto) {
         User updatedUser = factory.getUserRepository().findById(id).get();
         updatedUser.setFirstName(updateUserDto.getFirstName());

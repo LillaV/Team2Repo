@@ -46,7 +46,10 @@ public class DonationController {
         return donationService.findById(id);
     }
 
-
+    @GetMapping("/size")
+    public long getSize(){
+        return donationService.getSize();
+    }
 
     @PostMapping()
     public ResponseEntity<String> saveDonation(@RequestBody SimpleDonationDto donationDto) {
@@ -93,7 +96,7 @@ public class DonationController {
     }
 
     @GetMapping("/filter")
-    public List<SimpleDonationDto> filterDonations(
+    public List<Donation> filterDonations(
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "pageSize") int pageSize,
             @RequestParam(name = "minAmount", required = false) Float minValue,
@@ -103,9 +106,8 @@ public class DonationController {
             @RequestParam(name = "campaignId", required = false) Long campaignId,
             @RequestParam(name = "searchTerm", required = false) String searchTerm,
             @RequestParam(name = "createdById", required = false) Long createdById,
-            @RequestParam(name = "createDate", required = false) LocalDate createDate,
-            @RequestParam(name = "startDate", required = false) LocalDate startDate,
-            @RequestParam(name = "endDate", required = false) LocalDate endDate,
+            @RequestParam(name = "createDateStart", required = false) LocalDate startDate,
+            @RequestParam(name = "createDateEnd", required = false) LocalDate endDate,
             @RequestParam(name = "benefactorId", required = false) Long benefactorId,
             @RequestParam(name = "approved", required = false) Boolean approved,
             @RequestParam(name = "approvedById", required = false) Long approvedById,
@@ -115,7 +117,7 @@ public class DonationController {
         Specification<Donation> spec = DonationSpecifications.filterDonations(
                 minValue, maxValue, value, currency,
                 campaignId, searchTerm, createdById,
-                createDate, startDate, endDate,
+                startDate, endDate,
                 benefactorId, approved,
                 approvedById, approvedDateStart, approvedDateEnd
         );

@@ -11,7 +11,7 @@ public class DonationSpecifications {
     public static Specification<Donation> filterDonations(
             Float minValue, Float maxValue, Float value, String currency,
             Long campaignId, String searchTerm, Long createdById,
-            LocalDate createDate, LocalDate startDate, LocalDate endDate,
+            LocalDate startDate, LocalDate endDate,
             Long benefactorId, Boolean approved,
             Long approvedById, LocalDate approvedDateStart, LocalDate approvedDateEnd
     ) {
@@ -45,10 +45,6 @@ public class DonationSpecifications {
 
             if (createdById != null) {
                 predicates.add(criteriaBuilder.equal(root.get("createdBy").get("id"), createdById));
-            }
-
-            if (createDate != null) {
-                predicates.add(criteriaBuilder.equal(root.get("createDate"), createDate));
             }
 
             if (startDate != null && endDate != null) {

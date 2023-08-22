@@ -77,18 +77,22 @@ public class DonationService {
             factory.getDonationRepository().save(donation);
     }
 
-    public List<SimpleDonationDto> filterDonationsWithPaging(Specification<Donation> spec, Pageable pageable) {
+    public List<Donation> filterDonationsWithPaging(Specification<Donation> spec, Pageable pageable) {
 
         Page<Donation> donations =  factory.getDonationRepository().findAll(
                 spec,
                 pageable
         );
 
-        return donations.stream().map(donation -> donationMapper.donationToSimpleDonationDto(donation)).collect(Collectors.toList());
+        return donations.stream().collect(Collectors.toList());
     }
 
     public List<String> getCurrencies(){
         return factory.getDonationRepository().getDistinctCurrencies();
+    }
+
+    public long getSize(){
+        return  factory.getDonationRepository().count();
     }
 
 }

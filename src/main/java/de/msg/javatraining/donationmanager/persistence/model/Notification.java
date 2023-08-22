@@ -21,6 +21,8 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Lob
+    @Column(length = 1000)
     private String text;
     private LocalDate date;
     @ManyToMany(fetch = FetchType.LAZY)

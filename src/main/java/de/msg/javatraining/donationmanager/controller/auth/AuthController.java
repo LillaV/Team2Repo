@@ -1,6 +1,7 @@
 package de.msg.javatraining.donationmanager.controller.auth;
 
 
+import de.msg.javatraining.donationmanager.config.notifications.events.UserDeactivatedEvent;
 import de.msg.javatraining.donationmanager.config.security.JwtUtils;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.repository.RoleRepository;
@@ -10,6 +11,7 @@ import de.msg.javatraining.donationmanager.service.security.UserDetailsImpl;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -50,6 +52,9 @@ public class AuthController {
 
   @Autowired
   RefreshTokenService refreshTokenService;
+  @Autowired
+  private ApplicationEventPublisher eventPublisher;
+
 
   private ResponseCookie createCookie(String token) {
     return ResponseCookie.from(REFRESHTOKEN_COOKIE_NAME, token)
@@ -73,9 +78,6 @@ public class AuthController {
 
       User user = this.userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
 
-//      if(!user.isActive()){
-//      }
-
       String jwt = jwtUtils.generateJwtToken(userDetails);
 
       List<String> permissions = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
@@ -98,7 +100,7 @@ public class AuthController {
             user.setActive(false);
             user.setFailedLoginAttempts(0);
             this.userRepository.save(user);
-
+            eventPublisher.publishEvent(new UserDeactivatedEvent(user));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Your account is currently deactivated!");
 
         }

@@ -1,10 +1,7 @@
 package de.msg.javatraining.donationmanager.persistence.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -49,4 +46,20 @@ public class User {
 
 
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", active=" + active +
+                ", newUser=" + newUser +
+                ", username='" + username + '\'' +
+                ", mobileNumber='" + mobileNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", campaigns=" + campaigns +
+                ", password='" + password + '\'' +
+                ", roles=" + roles.toString()+
+                '}';
+    }
 }

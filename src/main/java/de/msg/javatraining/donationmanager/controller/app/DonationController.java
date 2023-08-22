@@ -2,6 +2,7 @@ package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
+import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.DonationService;
@@ -9,6 +10,7 @@ import de.msg.javatraining.donationmanager.service.UserService;
 import de.msg.javatraining.donationmanager.service.utils.DonationSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -27,10 +29,10 @@ public class DonationController {
     @Autowired
     private  UserService userService;
 
-//    @GetMapping("/{offset}/{pageSize}")
-//    public List<SimpleDonationDto> getPage(@PathVariable(name = "offset") int offset, @PathVariable(name = "pageSize") int pageSize) {
-//        return donationService.allDonationsWithPagination(offset, pageSize);
-//    }
+    @GetMapping("/currencies")
+    public List<String> getCurrencies(){
+        return donationService.getCurrencies();
+    }
 
     @GetMapping()
     public List<Donation> getPage(
@@ -44,7 +46,10 @@ public class DonationController {
         return donationService.findById(id);
     }
 
-
+    @GetMapping("/size")
+    public long getSize(){
+        return donationService.getSize();
+    }
 
     @PostMapping()
     public ResponseEntity<String> saveDonation(@RequestBody SimpleDonationDto donationDto) {
@@ -67,58 +72,59 @@ public class DonationController {
         }
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteDonation(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteDonation(@PathVariable("id") Long id) {
         Donation donationDto = donationService.findById(id);
         if(!donationDto.isApproved()){
             donationService.deleteDonation(id);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>("Donation deleted successfully", HttpStatus.OK);
         }else {
             return new ResponseEntity<>("Donation is already approved, you cannot delete it anymore.", HttpStatus.FORBIDDEN);
         }
     }
 
-    @PutMapping("/approve/{donationId}/{approvedById}")
-    public ResponseEntity approveDonation(@PathVariable Long donationId, @PathVariable Long approvedById){
+    @PutMapping("/approve")
+    public ResponseEntity approveDonation(@RequestParam(name = "donationId") Long donationId,
+                                          @RequestParam(name = "approvedById") Long approvedById){
         Donation donation = donationService.findById(donationId);
         User approvedBy = userService.findById(approvedById);
         if (donation.getCreatedBy().getId() != approvedById){
             donationService.approveDonation(donation, approvedBy);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>("Donation approved successfully", HttpStatus.OK);
         } else {
-            return new ResponseEntity("4 Augen Prinzip is violated", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("4 Augen Prinzip is violated", HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/filter")
-    public List<SimpleDonationDto> filterDonations(
-            @RequestParam(name = "minValue", required = false) Float minValue,
-            @RequestParam(name = "maxValue", required = false) Float maxValue,
+    public List<Donation> filterDonations(
+            @RequestParam(name = "offset") int offset,
+            @RequestParam(name = "pageSize") int pageSize,
+            @RequestParam(name = "minAmount", required = false) Float minValue,
+            @RequestParam(name = "maxAmount", required = false) Float maxValue,
             @RequestParam(name = "value", required = false) Float value,
             @RequestParam(name = "currency", required = false) String currency,
             @RequestParam(name = "campaignId", required = false) Long campaignId,
             @RequestParam(name = "searchTerm", required = false) String searchTerm,
             @RequestParam(name = "createdById", required = false) Long createdById,
-            @RequestParam(name = "createDate", required = false) LocalDate createDate,
-            @RequestParam(name = "startDate", required = false) LocalDate startDate,
-            @RequestParam(name = "endDate", required = false) LocalDate endDate,
+            @RequestParam(name = "createDateStart", required = false) LocalDate startDate,
+            @RequestParam(name = "createDateEnd", required = false) LocalDate endDate,
             @RequestParam(name = "benefactorId", required = false) Long benefactorId,
             @RequestParam(name = "approved", required = false) Boolean approved,
             @RequestParam(name = "approvedById", required = false) Long approvedById,
             @RequestParam(name = "approvedDateStart", required = false) LocalDate approvedDateStart,
-            @RequestParam(name = "approvedDateEnd", required = false) LocalDate approvedDateEnd,
-            Pageable pageable
+            @RequestParam(name = "approvedDateEnd", required = false) LocalDate approvedDateEnd
     ) {
         Specification<Donation> spec = DonationSpecifications.filterDonations(
                 minValue, maxValue, value, currency,
                 campaignId, searchTerm, createdById,
-                createDate, startDate, endDate,
+                startDate, endDate,
                 benefactorId, approved,
                 approvedById, approvedDateStart, approvedDateEnd
         );
 
         return donationService.filterDonationsWithPaging(
                 spec,
-                pageable
+                PageRequest.of(offset, pageSize)
         );
     }
 }

@@ -2,21 +2,15 @@ package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
-import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonationMapper;
 import de.msg.javatraining.donationmanager.persistence.factories.IDonationServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
-import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
-import de.msg.javatraining.donationmanager.service.utils.DonationSpecifications;
-import de.msg.javatraining.donationmanager.service.utils.UserServiceUtils;
 import de.msg.javatraining.donationmanager.service.validation.DonationValidator;
-import de.msg.javatraining.donationmanager.service.validation.UserValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,10 +28,10 @@ public class DonationService {
     IDonationServiceFactory factory;
 
     @Autowired
-    IUserServiceFactory userFactory;
+    DonationMapper donationMapper;
 
     @Autowired
-    DonationMapper donationMapper;
+    DonationValidator donationValidator;
 
     public List<Donation> allDonationsWithPagination(int offset, int pageSize){
         Page<Donation> donations =  factory.getDonationRepository().findAll(PageRequest.of(offset, pageSize));
@@ -56,7 +47,7 @@ public class DonationService {
         donationToSave.setCreateDate(LocalDate.now());
         donationToSave.setApproved(false);
 
-        DonationValidator.donationValidation(donationToSave);
+        donationValidator.validate(donationToSave);
 
         factory.getDonationRepository().save(donationToSave);
     }
@@ -70,7 +61,7 @@ public class DonationService {
         updatedDonation.setBenefactor(updateDonationDto.getBenefactor());
         updatedDonation.setNotes(updateDonationDto.getNotes());
 
-        DonationValidator.donationValidation(updatedDonation);
+        donationValidator.validate(updatedDonation);
 
         factory.getDonationRepository().save(updatedDonation);
     }
@@ -86,13 +77,22 @@ public class DonationService {
             factory.getDonationRepository().save(donation);
     }
 
-    public List<SimpleDonationDto> filterDonationsWithPaging(Specification<Donation> spec, Pageable pageable) {
+    public List<Donation> filterDonationsWithPaging(Specification<Donation> spec, Pageable pageable) {
 
         Page<Donation> donations =  factory.getDonationRepository().findAll(
                 spec,
                 pageable
         );
 
-        return donations.stream().map(donation -> donationMapper.donationToSimpleDonationDto(donation)).collect(Collectors.toList());
+        return donations.stream().collect(Collectors.toList());
     }
+
+    public List<String> getCurrencies(){
+        return factory.getDonationRepository().getDistinctCurrencies();
+    }
+
+    public long getSize(){
+        return  factory.getDonationRepository().count();
+    }
+
 }

@@ -33,11 +33,9 @@ public class Donation {
     @ManyToOne
     @JoinColumn(name = "auser_id")
     private User approvedBy;
-//    @ManyToOne(cascade = CascadeType.PERSIST)
     @ManyToOne
+    @JoinColumn(name = "campaign_id")
     private Campaign campaign;
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @ManyToOne(cascade = CascadeType.PERSIST)
     @ManyToOne
     @JoinColumn(name = "donator_id")
     private Donator benefactor;

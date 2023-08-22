@@ -37,6 +37,8 @@ public class UserService {
     @Autowired
     IUserServiceFactory factory;
     @Autowired
+    UserValidator userValidator;
+    @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     public List<UserDto> allUsersWithPagination(int offset, int pageSize) {
@@ -45,6 +47,12 @@ public class UserService {
     }
 
     public String updateUser(Long id, UpdateUserDto updateUserDto) {
+    public List<UserDto> getAllUsers(){
+        List<User> users = factory.getUserRepository().findAll();
+        return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
+    }
+
+    public User updateUser(Long id, UpdateUserDto updateUserDto) {
         User updatedUser = factory.getUserRepository().findById(id).get();
         String beforeUpdate = updatedUser.toString();
         updatedUser.setFirstName(updateUserDto.getFirstName());
@@ -105,7 +113,7 @@ public class UserService {
             User userToSave = CreateUserMapper.createUserDtoToUser(userDto, roles, campaigns);
             String password = UserServiceUtils.generateUUID();
             userToSave.setPassword(password);
-            if (UserValidator.userValidation(userToSave)) {
+            if (userValidator.validate(userToSave)) {
                 userToSave.setUsername(serviceUtils.generateUsername(userToSave, factory.getUserRepository().findAll()));
                 User user = factory.getUserRepository().save(userToSave);
                 if (user != null) {

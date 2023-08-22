@@ -6,6 +6,7 @@ import de.msg.javatraining.donationmanager.persistence.factories.IDonatorService
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
+import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.validation.DonatorValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,9 +28,12 @@ public class DonatorService {
 
     @Autowired
     DonatorMapper donatorMapper;
-    public List<SimpleDonatorDto> allDonatorsWithPagination(int offset, int pageSize){
+
+    @Autowired
+    DonatorValidator donatorValidator;
+    public List<Donator> allDonatorsWithPagination(int offset, int pageSize){
         Page<Donator> donators =  factory.getDonatorRepository().findAll(PageRequest.of(offset, pageSize));
-        return donators.stream().map(donator -> donatorMapper.donatorToSimpleDonatorDto(donator)).collect(Collectors.toList());
+        return donators.stream().collect(Collectors.toList());
     }
 
     public Donator updateDonator(Long id, SimpleDonatorDto simpleDonatorDto) {
@@ -64,7 +68,7 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
     // Check if the donator already exists based on first name, last name, additional name, and maiden name
     if (!factory.getDonatorRepository().existsByFirstNameAndLastNameAndAdditionalNameAndMaidenName(
             donator.getFirstName(), donator.getLastName(), donator.getAdditionalName(), donator.getMaidenName())) {
-        if (DonatorValidator.donatorValidation(donator)) {
+        if (donatorValidator.validate(donator)) {
             factory.getDonatorRepository().save(donator);
         } else {
             System.out.println("Cannot save");
@@ -73,6 +77,10 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
         System.out.println("Donator already exists");
     }
 }
+
+    public Donator findById(Long id) {
+        return factory.getDonatorRepository().findById(id).get();
+    }
 
 
 

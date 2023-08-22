@@ -32,9 +32,16 @@ public class UserService {
     UserServiceUtils serviceUtils;
     @Autowired
     IUserServiceFactory factory;
+    @Autowired
+    UserValidator userValidator;
 
     public List<UserDto> allUsersWithPagination(int offset, int pageSize) {
         Page<User> users = factory.getUserRepository().findAll(PageRequest.of(offset, pageSize));
+        return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
+    }
+
+    public List<UserDto> getAllUsers(){
+        List<User> users = factory.getUserRepository().findAll();
         return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
     }
 
@@ -47,7 +54,9 @@ public class UserService {
         updatedUser.setEmail(updateUserDto.getEmail());
         updatedUser.setMobileNumber(updateUserDto.getMobileNumber());
         updatedUser.setRoles(updateUserDto.getRoles());
-        factory.getUserRepository().save(updatedUser);
+        if(userValidator.validate(updatedUser)){
+            factory.getUserRepository().save(updatedUser);
+        }
         return updatedUser;
     }
 
@@ -65,9 +74,8 @@ public class UserService {
         return updatedUser;
     }
 
-    public UserDto findById(Long id) {
-        User userToFind = factory.getUserRepository().findById(id).get();
-        return userMapper.userToUserDto(userToFind);
+    public User findById(Long id) {
+        return factory.getUserRepository().findById(id).get();
     }
 
     public void deleteUserById(Long id) {
@@ -93,7 +101,7 @@ public class UserService {
             User userToSave = CreateUserMapper.createUserDtoToUser(userDto, roles, campaigns);
             String password = UserServiceUtils.generateUUID();
             userToSave.setPassword(password);
-            if (UserValidator.userValidation(userToSave)) {
+            if (userValidator.validate(userToSave)) {
                 userToSave.setUsername(serviceUtils.generateUsername(userToSave, factory.getUserRepository().findAll()));
                 User user = factory.getUserRepository().save(userToSave);
                 if (user != null) {

@@ -22,7 +22,7 @@ public class DonatorController {
     private DonatorService donatorService;
 
     @GetMapping("/{offset}/{pageSize}")
-    public List<SimpleDonatorDto> getPage(@PathVariable(name = "offset") int offset, @PathVariable(name = "pageSize") int pageSize) {
+    public List<Donator> getPage(@PathVariable(name = "offset") int offset, @PathVariable(name = "pageSize") int pageSize) {
         return donatorService.allDonatorsWithPagination(offset, pageSize);
     }
 
@@ -35,7 +35,11 @@ public class DonatorController {
         catch (Exception exception){
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
+    }
 
+    @GetMapping("{id}")
+    public Donator getDonatorById(@PathVariable(name = "id") Long id){
+        return  donatorService.findById(id);
     }
 
 

@@ -9,12 +9,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/campaigns")
 public class CampaignController {
 
     @Autowired
     private CampaignService campaignService;
+    @GetMapping()
+    public List<CampaignDto> getCampaigns(){
+        return campaignService.getCampaigns();
+    }
 
     @PostMapping()
     public ResponseEntity<String> saveCampaign(@RequestBody CampaignDto campaignDto) {
@@ -33,6 +39,22 @@ public class CampaignController {
         try{
             campaignService.updateCampaign(id, campaign);
             return new ResponseEntity<>("Campaign saved", HttpStatus.OK);
+        }
+        catch (Exception exception){
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        }
+    }
+
+    @GetMapping("{id}")
+    public CampaignDto findCampaignById(@PathVariable(name = "id") Long id){
+        return campaignService.findById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteCampaignById(@PathVariable(name = "id") Long id){
+        try{
+            campaignService.deleteCampaignById(id);
+            return new ResponseEntity<>("Campaign deleted", HttpStatus.OK);
         }
         catch (Exception exception){
             return ResponseEntity.badRequest().body(exception.getMessage());

@@ -4,6 +4,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
+import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,13 @@ public class UserController {
         return userService.allUsersWithPagination(offset, pageSize);
     }
 
+    @GetMapping()
+    public List<UserDto> getUsers(){
+        return userService.getAllUsers();
+    }
+
     @GetMapping("{id}")
-    public UserDto getUserById(@PathVariable(name = "id") Long id){
+    public User getUserById(@PathVariable(name = "id") Long id){
         return  userService.findById(id);
     }
 
@@ -37,7 +43,6 @@ public class UserController {
         catch (Exception exception){
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
-
     }
     @PutMapping("/{id}/firstLogin")
     public ResponseEntity firstLoginChanges(@PathVariable("id") Long id,@RequestBody FirstLoginDto password){

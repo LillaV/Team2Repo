@@ -2,14 +2,18 @@ package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CampaignMapper;
+import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.factories.IDonationServiceFactory;
+import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
+import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.repository.CampaignRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,7 +23,13 @@ public class CampaignService{
     private CampaignRepository campaignRepository;
 
     @Autowired
-    IDonationServiceFactory factory;
+    IDonationServiceFactory donationFactory;
+
+    @Autowired
+    IUserServiceFactory userFactory;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private CampaignMapper campaignMapper;
@@ -48,10 +58,19 @@ public class CampaignService{
 
     public void deleteCampaignById(Long id){
         Campaign campaignToFind=campaignRepository.findById(id).get();
-        if(factory.getDonationRepository().existsByCampaignAndApprovedTrue(campaignToFind)){
+        if(donationFactory.getDonationRepository().existsByCampaignAndApprovedTrue(campaignToFind)){
             throw new RuntimeException("Not allowed to delete");
         }else {
             campaignRepository.deleteById(id);
+            List<User> list=userFactory.getUserRepository().findAllByCampaignsIsContaining(id);
+            for(User u:list){
+                Set<Campaign> campaignSet=u.getCampaigns();
+                campaignSet.remove(campaignToFind);
+                u.setCampaigns(campaignSet);
+                UpdateUserDto userToSave=userService.userMapper.userToUpdateUserDto(u);
+                userService.updateUser(u.getId(),userToSave);
+
+            }
         }
     }
 

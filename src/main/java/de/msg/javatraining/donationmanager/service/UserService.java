@@ -47,6 +47,7 @@ public class UserService {
         updatedUser.setEmail(updateUserDto.getEmail());
         updatedUser.setMobileNumber(updateUserDto.getMobileNumber());
         updatedUser.setRoles(updateUserDto.getRoles());
+        updatedUser.setCampaigns(updateUserDto.getCampaigns());
         factory.getUserRepository().save(updatedUser);
         return updatedUser;
     }

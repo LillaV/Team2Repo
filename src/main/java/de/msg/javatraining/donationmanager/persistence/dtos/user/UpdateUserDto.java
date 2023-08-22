@@ -23,4 +23,5 @@ public class UpdateUserDto {
     private String email;
     private String mobileNumber;
     private Set<Role> roles = new HashSet<>();
+    private Set<Campaign> campaigns = new HashSet<>();
 }

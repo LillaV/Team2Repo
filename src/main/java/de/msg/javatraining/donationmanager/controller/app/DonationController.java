@@ -29,11 +29,6 @@ public class DonationController {
     @Autowired
     private  UserService userService;
 
-//    @GetMapping("/{offset}/{pageSize}")
-//    public List<SimpleDonationDto> getPage(@PathVariable(name = "offset") int offset, @PathVariable(name = "pageSize") int pageSize) {
-//        return donationService.allDonationsWithPagination(offset, pageSize);
-//    }
-
     @GetMapping("/currencies")
     public List<String> getCurrencies(){
         return donationService.getCurrencies();
@@ -129,15 +124,5 @@ public class DonationController {
                 spec,
                 PageRequest.of(offset, pageSize)
         );
-    }
-
-    @GetMapping("/campaigns")
-    public List<Campaign> getCampaigns(){
-        return donationService.getCampaigns();
-    }
-
-    @GetMapping("/users")
-    public List<User> getUsers(){
-        return donationService.getUsers();
     }
 }

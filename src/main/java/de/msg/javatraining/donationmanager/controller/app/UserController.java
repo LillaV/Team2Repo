@@ -24,6 +24,11 @@ public class UserController {
         return userService.allUsersWithPagination(offset, pageSize);
     }
 
+    @GetMapping()
+    public List<UserDto> getUsers(){
+        return userService.getAllUsers();
+    }
+
     @GetMapping("{id}")
     public User getUserById(@PathVariable(name = "id") Long id){
         return  userService.findById(id);

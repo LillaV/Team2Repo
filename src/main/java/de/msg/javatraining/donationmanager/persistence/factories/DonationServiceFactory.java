@@ -11,22 +11,7 @@ public class DonationServiceFactory implements IDonationServiceFactory{
     @Autowired
     DonationRepository donationRepository;
 
-    @Autowired
-    CampaignRepository campaignRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
     @Override
     public DonationRepository getDonationRepository() { return donationRepository; }
 
-    @Override
-    public CampaignRepository getCampaignRepository() {
-        return campaignRepository;
-    }
-
-    @Override
-    public UserRepository getUserRepository(){
-        return userRepository;
-    }
 }

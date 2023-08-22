@@ -7,7 +7,4 @@ import de.msg.javatraining.donationmanager.persistence.repository.UserRepository
 public interface IDonationServiceFactory {
     DonationRepository getDonationRepository();
 
-    CampaignRepository getCampaignRepository();
-
-    UserRepository getUserRepository();
 }

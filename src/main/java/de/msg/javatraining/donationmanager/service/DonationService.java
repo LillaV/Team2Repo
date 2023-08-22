@@ -28,9 +28,6 @@ public class DonationService {
     IDonationServiceFactory factory;
 
     @Autowired
-    IUserServiceFactory userFactory;
-
-    @Autowired
     DonationMapper donationMapper;
 
     @Autowired
@@ -94,11 +91,4 @@ public class DonationService {
         return factory.getDonationRepository().getDistinctCurrencies();
     }
 
-    public List<Campaign> getCampaigns(){
-        return factory.getCampaignRepository().findAll();
-    }
-
-    public List<User> getUsers(){
-        return factory.getUserRepository().findAll();
-    }
 }

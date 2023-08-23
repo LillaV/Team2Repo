@@ -31,4 +31,9 @@ public class Donator {
             joinColumns = @JoinColumn(name = "donator_id"),
             inverseJoinColumns = @JoinColumn(name = "campaign_id"))
     private Set<Campaign> campaigns = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return  firstName + " " + lastName;
+    }
 }

@@ -25,5 +25,9 @@ public class Campaign {
     @Column(nullable = false)
     private String purpose;
 
+    @Override
+    public String toString() {
+        return  name;
+    }
 
 }

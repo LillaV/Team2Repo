@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
+import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.donator.SimpleDonatorDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
@@ -24,6 +25,11 @@ public class DonatorController {
     @GetMapping("/{offset}/{pageSize}")
     public List<Donator> getPage(@PathVariable(name = "offset") int offset, @PathVariable(name = "pageSize") int pageSize) {
         return donatorService.allDonatorsWithPagination(offset, pageSize);
+    }
+
+    @GetMapping()
+    public List<Donator> getDonators(){
+        return donatorService.getDonators();
     }
 
     @PostMapping()

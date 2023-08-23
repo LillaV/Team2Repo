@@ -1,4 +1,4 @@
-package de.msg.javatraining.donationmanager.service.utils;
+package de.msg.javatraining.donationmanager.service.filter;
 
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import org.springframework.data.jpa.domain.Specification;

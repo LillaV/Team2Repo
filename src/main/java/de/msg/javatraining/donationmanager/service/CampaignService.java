@@ -4,6 +4,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CampaignMapper;
 import de.msg.javatraining.donationmanager.persistence.factories.IDonationServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
+import de.msg.javatraining.donationmanager.persistence.model.CampaignFilterPair;
 import de.msg.javatraining.donationmanager.persistence.repository.CampaignRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -64,10 +65,14 @@ public class CampaignService{
         }
     }
 
-    public List<Campaign> filterCampaignsWithPaging(Specification<Campaign> spec, Pageable pageable) {
+    public CampaignFilterPair filterCampaignsWithPaging(Specification<Campaign> spec, Pageable pageable) {
+        int size = campaignRepository.findAll(spec).size();
         Page<Campaign> campaigns = campaignRepository.findAll(spec, pageable);
 
-        return  campaigns.stream().collect(Collectors.toList());
+        return  new CampaignFilterPair(campaigns.stream().collect(Collectors.toList()), size);
     }
 
+    public long getSize() {
+        return campaignRepository.count();
+    }
 }

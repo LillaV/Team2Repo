@@ -2,17 +2,14 @@ package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
-import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import de.msg.javatraining.donationmanager.persistence.model.DonationFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.DonationService;
 import de.msg.javatraining.donationmanager.service.UserService;
-import de.msg.javatraining.donationmanager.service.utils.DonationSpecifications;
+import de.msg.javatraining.donationmanager.service.filter.DonationSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +25,12 @@ public class DonationController {
     private DonationService donationService;
 
     @Autowired
-    private  UserService userService;
+    private UserService userService;
+
+    @Autowired
+    private DonationSpecifications donationSpecifications;
+
+    @Autowired
 
     @GetMapping("/currencies")
     public List<String> getCurrencies(){
@@ -108,7 +110,7 @@ public class DonationController {
             @RequestParam(name = "approvedDateStart", required = false) LocalDate approvedDateStart,
             @RequestParam(name = "approvedDateEnd", required = false) LocalDate approvedDateEnd
     ) {
-        Specification<Donation> spec = DonationSpecifications.filterDonations(
+        Specification<Donation> spec = donationSpecifications.filterDonations(
                 minValue, maxValue, value, currency,
                 campaignId, searchTerm, createdById,
                 startDate, endDate,

@@ -2,6 +2,7 @@ package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.DonationService;
@@ -52,23 +53,23 @@ public class DonationController {
 
 
     @PostMapping()
-    public ResponseEntity<String> saveDonation(@RequestBody SimpleDonationDto donationDto) {
+    public TextResponse saveDonation(@RequestBody SimpleDonationDto donationDto) {
         try{
             donationService.saveDonation(donationDto);
-            return new ResponseEntity<>("Donation saved", HttpStatus.OK);
+            return new TextResponse("Donation added");
         }
         catch (Exception exception){
-            return ResponseEntity.badRequest().body(exception.getMessage());
+            return new TextResponse(exception.getMessage());
         }
     }
     @PutMapping("/{id}")
-    public ResponseEntity updateDonation(@RequestBody() UpdateDonationDto updateDonationDto, @PathVariable("id") Long id) {
+    public TextResponse updateDonation(@RequestBody() UpdateDonationDto updateDonationDto, @PathVariable("id") Long id) {
         Donation donation = donationService.findById(id);
         if(!donation.isApproved()){
             donationService.updateDonation(id, updateDonationDto);
-            return new ResponseEntity<>( "Donation updated", HttpStatus.OK);
+            return new TextResponse( "Donation updated");
         } else {
-            return new ResponseEntity<>("Donation is already approved, you cannot edit it anymore.", HttpStatus.FORBIDDEN);
+            return new TextResponse("Donation is already approved, you cannot edit it anymore.");
         }
     }
     @DeleteMapping("/{id}")

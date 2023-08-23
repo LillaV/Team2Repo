@@ -8,6 +8,7 @@ import de.msg.javatraining.donationmanager.persistence.factories.IDonationServic
 import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
+import de.msg.javatraining.donationmanager.persistence.model.DonationFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.validation.DonationValidator;
 import jakarta.transaction.Transactional;
@@ -83,14 +84,15 @@ public class DonationService {
             eventPublisher.publishEvent(new DonationApprovedEvent(donation));
     }
 
-    public List<Donation> filterDonationsWithPaging(Specification<Donation> spec, Pageable pageable) {
+    public DonationFilterPair filterDonationsWithPaging(Specification<Donation> spec, Pageable pageable) {
 
+        int size =  factory.getDonationRepository().findAll(spec).size();
         Page<Donation> donations =  factory.getDonationRepository().findAll(
                 spec,
                 pageable
         );
 
-        return donations.stream().collect(Collectors.toList());
+        return new DonationFilterPair(donations.stream().collect(Collectors.toList()), size) ;
     }
 
     public List<String> getCurrencies(){

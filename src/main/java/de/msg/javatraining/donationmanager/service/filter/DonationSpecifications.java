@@ -1,14 +1,17 @@
-package de.msg.javatraining.donationmanager.service.utils;
+package de.msg.javatraining.donationmanager.service.filter;
 
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class DonationSpecifications {
-    public static Specification<Donation> filterDonations(
+    public Specification<Donation> filterDonations(
             Float minValue, Float maxValue, Float value, String currency,
             Long campaignId, String searchTerm, Long createdById,
             LocalDate startDate, LocalDate endDate,

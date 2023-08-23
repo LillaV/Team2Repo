@@ -1,17 +1,15 @@
 package de.msg.javatraining.donationmanager.service;
 
-import de.msg.javatraining.donationmanager.config.notifications.events.DeletedUserEvent;
-import de.msg.javatraining.donationmanager.config.notifications.events.NewUserEvent;
-import de.msg.javatraining.donationmanager.config.notifications.events.UpdatedUserEvent;
-import de.msg.javatraining.donationmanager.config.notifications.events.UserDeactivatedEvent;
+import de.msg.javatraining.donationmanager.config.notifications.events.*;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.NotificationMapper;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.NotificationMapperImpl;
 import de.msg.javatraining.donationmanager.persistence.dtos.notification.NotificationDTO;
+import de.msg.javatraining.donationmanager.persistence.dtos.notification.NotificationPaginationDTO;
 import de.msg.javatraining.donationmanager.persistence.model.Notification;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.model.enums.EPermission;
 import de.msg.javatraining.donationmanager.persistence.repository.NotificationRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
@@ -19,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -67,7 +64,7 @@ public class NotificationService {
         List<User> users = userRepository.findAllByPermissions(EPermission.AUTHORITY_USER_MANAGEMENT);
         notification.setUsers(new HashSet<>(users));
         notificationRepository.save(notification);
-        messagingTemplate.convertAndSend("/topic/userUpdated",mapper.notificationToNotificationDTO(notification));
+        messagingTemplate.convertAndSend("/topic/userManagement",mapper.notificationToNotificationDTO(notification));
     }
 
     @EventListener(UserDeactivatedEvent.class)
@@ -82,7 +79,7 @@ public class NotificationService {
         notification.setUsers(new HashSet<>(users));
         notification.setDate(LocalDate.now());
         notificationRepository.save(notification);
-        messagingTemplate.convertAndSend("/topic/userDeactivated",mapper.notificationToNotificationDTO(notification));
+        messagingTemplate.convertAndSend("/topic/userManagement",mapper.notificationToNotificationDTO(notification));
     }
 
     @EventListener(DeletedUserEvent.class)
@@ -97,12 +94,34 @@ public class NotificationService {
         notification.setUsers(new HashSet<>(users));
         notification.setDate(LocalDate.now());
         notificationRepository.save(notification);
-        messagingTemplate.convertAndSend("/topic/userDeleted",mapper.notificationToNotificationDTO(notification));
+        messagingTemplate.convertAndSend("/topic/userManagement",mapper.notificationToNotificationDTO(notification));
     }
 
+    @EventListener(DonationApprovedEvent.class)
+    public void handleDonationApproved(DonationApprovedEvent event){
+        Notification notification = new Notification();
+        StringBuilder messageBuilder = new StringBuilder();
+        messageBuilder.append("Your donation with id  ");
+        messageBuilder.append(event.getDonation().getId());
+        messageBuilder.append(" created on ");
+        messageBuilder.append(event.getDonation().getCreateDate());
+        messageBuilder.append(" was approved.");
+        notification.setText(messageBuilder.toString());
+        notification.setUsers(new HashSet<>(Collections.singletonList(event.getDonation().getCreatedBy())));
+        notification.setDate(LocalDate.now());
+        notificationRepository.save(notification);
+        messagingTemplate.convertAndSend("/topic/"+event.getDonation().getCreatedBy().getUsername(),mapper.notificationToNotificationDTO(notification));
+    }
 
-    public List<NotificationDTO> getNotifications(int load, int number){
+    public NotificationPaginationDTO getNotifications(int load, int number, long userId){
         Page<Notification> notifications = notificationRepository.findAll(PageRequest.of(load, number));
-        return notifications.stream().map(notification -> mapper.notificationToNotificationDTO(notification)).collect(Collectors.toList());
+        List<NotificationDTO> notificationsList = notifications.stream().map(notification -> mapper.notificationToNotificationDTO(notification)).collect(Collectors.toList());
+        Long usersNotificationsCnt = notificationRepository.getPossibleMaxPage(userId);
+        return new NotificationPaginationDTO(notificationsList,usersNotificationsCnt/number);
+    }
+
+    public List<NotificationDTO> recentNotifications(Long userId){
+        Page<Notification> notifications = notificationRepository.getUserNotifications(userId,PageRequest.of(0,3));
+        return notifications.stream().map(mapper::notificationToNotificationDTO).collect(Collectors.toList());
     }
 }

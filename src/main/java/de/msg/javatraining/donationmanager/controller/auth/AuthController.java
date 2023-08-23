@@ -95,7 +95,6 @@ public class AuthController {
     catch (BadCredentialsException e){
         User user = this.userRepository.findByUsername(loginRequest.getUsername()).orElseThrow();
         user.setFailedLoginAttempts(user.getFailedLoginAttempts()+1);
-
         if(user.getFailedLoginAttempts() >= 5){
             user.setActive(false);
             user.setFailedLoginAttempts(0);

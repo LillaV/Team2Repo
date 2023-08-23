@@ -46,13 +46,8 @@ public class UserService {
         return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
     }
 
-    public String updateUser(Long id, UpdateUserDto updateUserDto) {
-    public List<UserDto> getAllUsers(){
-        List<User> users = factory.getUserRepository().findAll();
-        return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
-    }
 
-    public User updateUser(Long id, UpdateUserDto updateUserDto) {
+    public void updateUser(Long id, UpdateUserDto updateUserDto) {
         User updatedUser = factory.getUserRepository().findById(id).get();
         String beforeUpdate = updatedUser.toString();
         updatedUser.setFirstName(updateUserDto.getFirstName());
@@ -62,13 +57,11 @@ public class UserService {
         updatedUser.setEmail(updateUserDto.getEmail());
         updatedUser.setMobileNumber(updateUserDto.getMobileNumber());
         updatedUser.setRoles(updateUserDto.getRoles());
-        if (UserValidator.userValidation(updatedUser)) {User user = factory.getUserRepository().save(updatedUser);
+        if (userValidator.validate(updatedUser)) {User user = factory.getUserRepository().save(updatedUser);
             if(user != null){
                 eventPublisher.publishEvent(new UpdatedUserEvent(user.toString(),beforeUpdate,user.getUsername()));
-                return "User updated";
             }
         }
-        return "Failed to update the user";
     }
 
     public void firstLogin(Long id, FirstLoginDto pd){
@@ -131,5 +124,8 @@ public class UserService {
         }
     }
 
+    public List<UserDto> getAllUsers() {
+        return  this.factory.getUserRepository().findAll().stream().map(userMapper::userToUserDto).collect(Collectors.toList());
+    }
 }
 

@@ -1,6 +1,7 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.notification.NotificationDTO;
+import de.msg.javatraining.donationmanager.persistence.dtos.notification.NotificationPaginationDTO;
 import de.msg.javatraining.donationmanager.persistence.model.Notification;
 import de.msg.javatraining.donationmanager.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,13 @@ import java.util.List;
 public class NotificationController {
     @Autowired
     NotificationService service;
-    @GetMapping("/{load}/{number}")
-    public List<NotificationDTO> myNotifications(@PathVariable("load") int load,@PathVariable("number") int number){
-        return service.getNotifications(load,number);
+    @GetMapping("/{load}/{number}/{userId}")
+    public NotificationPaginationDTO myNotifications(@PathVariable("load") int load, @PathVariable("number") int number, @PathVariable("userId") long userId){
+        return service.getNotifications(load,number,userId);
+    }
+
+    @GetMapping("/{userId}")
+    public List<NotificationDTO> myNotifications(@PathVariable("userId") Long userId){
+        return service.recentNotifications(userId);
     }
 }

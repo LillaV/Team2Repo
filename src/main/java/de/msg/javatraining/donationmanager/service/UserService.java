@@ -1,5 +1,8 @@
 package de.msg.javatraining.donationmanager.service;
 
+import de.msg.javatraining.donationmanager.config.notifications.events.DeletedUserEvent;
+import de.msg.javatraining.donationmanager.config.notifications.events.NewUserEvent;
+import de.msg.javatraining.donationmanager.config.notifications.events.UpdatedUserEvent;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
@@ -13,6 +16,7 @@ import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.utils.UserServiceUtils;
 import de.msg.javatraining.donationmanager.service.validation.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,19 +38,18 @@ public class UserService {
     IUserServiceFactory factory;
     @Autowired
     UserValidator userValidator;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public List<UserDto> allUsersWithPagination(int offset, int pageSize) {
         Page<User> users = factory.getUserRepository().findAll(PageRequest.of(offset, pageSize));
         return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
     }
 
-    public List<UserDto> getAllUsers(){
-        List<User> users = factory.getUserRepository().findAll();
-        return users.stream().map(user -> userMapper.userToUserDto(user)).collect(Collectors.toList());
-    }
 
-    public User updateUser(Long id, UpdateUserDto updateUserDto) {
+    public void updateUser(Long id, UpdateUserDto updateUserDto) {
         User updatedUser = factory.getUserRepository().findById(id).get();
+        String beforeUpdate = updatedUser.toString();
         updatedUser.setFirstName(updateUserDto.getFirstName());
         updatedUser.setLastName(updateUserDto.getLastName());
         updatedUser.setActive(updateUserDto.isActive());
@@ -54,10 +57,11 @@ public class UserService {
         updatedUser.setEmail(updateUserDto.getEmail());
         updatedUser.setMobileNumber(updateUserDto.getMobileNumber());
         updatedUser.setRoles(updateUserDto.getRoles());
-        if(userValidator.validate(updatedUser)){
-            factory.getUserRepository().save(updatedUser);
+        if (userValidator.validate(updatedUser)) {User user = factory.getUserRepository().save(updatedUser);
+            if(user != null){
+                eventPublisher.publishEvent(new UpdatedUserEvent(user.toString(),beforeUpdate,user.getUsername()));
+            }
         }
-        return updatedUser;
     }
 
     public void firstLogin(Long id, FirstLoginDto pd){
@@ -70,7 +74,8 @@ public class UserService {
     public User toggleActivation(Long id){
         User updatedUser = factory.getUserRepository().findById(id).get();
         updatedUser.setActive(!updatedUser.isActive());
-        factory.getUserRepository().save(updatedUser);
+        User user = factory.getUserRepository().save(updatedUser);
+        eventPublisher.publishEvent(new DeletedUserEvent(user));
         return updatedUser;
     }
 
@@ -105,6 +110,8 @@ public class UserService {
                 userToSave.setUsername(serviceUtils.generateUsername(userToSave, factory.getUserRepository().findAll()));
                 User user = factory.getUserRepository().save(userToSave);
                 if (user != null) {
+                    System.out.println("Am ajuns aici");
+                    eventPublisher.publishEvent(new NewUserEvent(user));
                     serviceUtils.sendSimpleMessage(user, password);
                 }
 
@@ -115,6 +122,10 @@ public class UserService {
         } else {
             System.out.println("Cannot save, user must have at least 1 role");
         }
+    }
+
+    public List<UserDto> getAllUsers() {
+        return  this.factory.getUserRepository().findAll().stream().map(userMapper::userToUserDto).collect(Collectors.toList());
     }
 }
 

@@ -54,14 +54,6 @@ public class DonatorService {
         }
     }
 
-//    public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
-//        Donator donator = donatorMapper.SimpleDonatorDtoToDonator(simpleDonatorDto);
-//        if (DonatorValidator.donatorValidation(donator)) {
-//            factory.getDonatorRepository().save(donator);
-//        } else {
-//            System.out.println("Cannot save");
-//        }
-//    }
 public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
     Donator donator = donatorMapper.SimpleDonatorDtoToDonator(simpleDonatorDto);
 

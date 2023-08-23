@@ -71,4 +71,6 @@ public class UserController {
         userService.deleteUserById(id);
         return new ResponseEntity<>("User deleted", HttpStatus.OK);
     }
+
+
 }

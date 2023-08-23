@@ -1,16 +1,20 @@
 package de.msg.javatraining.donationmanager.service;
 
+import de.msg.javatraining.donationmanager.config.notifications.events.DonationApprovedEvent;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonationMapper;
 import de.msg.javatraining.donationmanager.persistence.factories.IDonationServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
+import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
+import de.msg.javatraining.donationmanager.persistence.model.DonationFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.security.UserDetailsImpl;
 import de.msg.javatraining.donationmanager.service.validation.DonationValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,13 +34,13 @@ public class DonationService {
     IDonationServiceFactory factory;
 
     @Autowired
-    IUserServiceFactory userFactory;
-
-    @Autowired
     DonationMapper donationMapper;
 
     @Autowired
     DonationValidator donationValidator;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public List<Donation> allDonationsWithPagination(int offset, int pageSize){
         Page<Donation> donations =  factory.getDonationRepository().findAll(PageRequest.of(offset, pageSize));
@@ -86,20 +90,26 @@ public class DonationService {
             donation.setApprovedBy(approvedBy);
             donation.setApprovedDate(LocalDate.now());
             factory.getDonationRepository().save(donation);
+            eventPublisher.publishEvent(new DonationApprovedEvent(donation));
     }
 
-    public List<SimpleDonationDto> filterDonationsWithPaging(Specification<Donation> spec, Pageable pageable) {
+    public DonationFilterPair filterDonationsWithPaging(Specification<Donation> spec, Pageable pageable) {
 
+        int size =  factory.getDonationRepository().findAll(spec).size();
         Page<Donation> donations =  factory.getDonationRepository().findAll(
                 spec,
                 pageable
         );
 
-        return donations.stream().map(donation -> donationMapper.donationToSimpleDonationDto(donation)).collect(Collectors.toList());
+        return new DonationFilterPair(donations.stream().collect(Collectors.toList()), size) ;
     }
 
     public List<String> getCurrencies(){
         return factory.getDonationRepository().getDistinctCurrencies();
+    }
+
+    public long getSize(){
+        return  factory.getDonationRepository().count();
     }
 
 }

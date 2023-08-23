@@ -4,6 +4,8 @@ import de.msg.javatraining.donationmanager.persistence.dtos.donator.SimpleDonato
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonatorMapper;
 import de.msg.javatraining.donationmanager.persistence.factories.IDonatorServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
+import de.msg.javatraining.donationmanager.persistence.model.Role;
+import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.validation.DonatorValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -55,14 +57,6 @@ public class DonatorService {
         }
     }
 
-//    public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
-//        Donator donator = donatorMapper.SimpleDonatorDtoToDonator(simpleDonatorDto);
-//        if (DonatorValidator.donatorValidation(donator)) {
-//            factory.getDonatorRepository().save(donator);
-//        } else {
-//            System.out.println("Cannot save");
-//        }
-//    }
 public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
     Donator donator = donatorMapper.SimpleDonatorDtoToDonator(simpleDonatorDto);
 
@@ -78,6 +72,10 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
         System.out.println("Donator already exists");
     }
 }
+
+    public Donator findById(Long id) {
+        return factory.getDonatorRepository().findById(id).get();
+    }
 
 
 

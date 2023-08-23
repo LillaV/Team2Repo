@@ -1,17 +1,20 @@
-package de.msg.javatraining.donationmanager.service.utils;
+package de.msg.javatraining.donationmanager.service.filter;
 
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class DonationSpecifications {
-    public static Specification<Donation> filterDonations(
+    public Specification<Donation> filterDonations(
             Float minValue, Float maxValue, Float value, String currency,
             Long campaignId, String searchTerm, Long createdById,
-            LocalDate createDate, LocalDate startDate, LocalDate endDate,
+            LocalDate startDate, LocalDate endDate,
             Long benefactorId, Boolean approved,
             Long approvedById, LocalDate approvedDateStart, LocalDate approvedDateEnd
     ) {
@@ -45,10 +48,6 @@ public class DonationSpecifications {
 
             if (createdById != null) {
                 predicates.add(criteriaBuilder.equal(root.get("createdBy").get("id"), createdById));
-            }
-
-            if (createDate != null) {
-                predicates.add(criteriaBuilder.equal(root.get("createDate"), createDate));
             }
 
             if (startDate != null && endDate != null) {

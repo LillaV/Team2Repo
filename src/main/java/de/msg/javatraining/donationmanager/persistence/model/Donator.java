@@ -25,6 +25,4 @@ public class Donator {
     private String lastName;
     private String additionalName;
     private String maidenName;
-//    @ManyToMany(fetch = FetchType.LAZY)
-
 }

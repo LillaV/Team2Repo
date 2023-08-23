@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.config.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.PropertyValueException;
 import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.hibernate.exception.ConstraintViolationException;
@@ -40,13 +41,36 @@ public class RestResponseStatusExceptionResolver {
         return new ResponseEntity<String>("bad password",HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler({RoleNotFoundException.class})
+    private ResponseEntity<String> handleBadPasswordException(RoleNotFoundException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({UserNotFoundException.class})
+    private ResponseEntity<String> handleBadPasswordException(UserNotFoundException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+
     @ExceptionHandler({PropertyValueException.class})
     private ResponseEntity<String> handlePropertyValueException(Exception exception){
         return new ResponseEntity<String>("bad request",HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({EntityNotFoundException.class})
+    private ResponseEntity<String> handlePropertyValueException(EntityNotFoundException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+
     @ExceptionHandler({InvalidDonationException.class})
     private ResponseEntity<String> handleInvalidDonationException(Exception exception){
         return new ResponseEntity<String>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler({DonatorNotFoundException.class})
+    private ResponseEntity<String> handleBadPasswordException(DonatorNotFoundException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
     }
 }

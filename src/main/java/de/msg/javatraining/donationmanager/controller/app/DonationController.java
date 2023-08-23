@@ -4,6 +4,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonat
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
+import de.msg.javatraining.donationmanager.persistence.model.DonationFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.DonationService;
 import de.msg.javatraining.donationmanager.service.UserService;
@@ -32,13 +33,6 @@ public class DonationController {
     @GetMapping("/currencies")
     public List<String> getCurrencies(){
         return donationService.getCurrencies();
-    }
-
-    @GetMapping()
-    public List<Donation> getPage(
-            @RequestParam(name = "offset") int offset,
-            @RequestParam(name = "pageSize") int pageSize) {
-        return donationService.allDonationsWithPagination(offset, pageSize);
     }
 
     @GetMapping("/{id}")
@@ -96,7 +90,7 @@ public class DonationController {
     }
 
     @GetMapping("/filter")
-    public List<Donation> filterDonations(
+    public DonationFilterPair filterDonations(
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "pageSize") int pageSize,
             @RequestParam(name = "minAmount", required = false) Float minValue,

@@ -6,6 +6,10 @@ import de.msg.javatraining.donationmanager.persistence.factories.IDonationServic
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.repository.CampaignRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,11 @@ public class CampaignService{
 
     @Autowired
     private CampaignMapper campaignMapper;
+
+    public List<CampaignDto> allCampaignsWithPagination(int offset, int pageSize){
+        Page<Campaign> campaigns = campaignRepository.findAll(PageRequest.of(offset, pageSize));
+        return campaigns.stream().map(campaign -> campaignMapper.campaignToCampaignDto(campaign)).collect(Collectors.toList());
+    }
 
     public List<CampaignDto> getCampaigns(){
         List<Campaign> campaigns=campaignRepository.findAll();
@@ -53,6 +62,12 @@ public class CampaignService{
         }else {
             campaignRepository.deleteById(id);
         }
+    }
+
+    public List<Campaign> filterCampaignsWithPaging(Specification<Campaign> spec, Pageable pageable) {
+        Page<Campaign> campaigns = campaignRepository.findAll(spec, pageable);
+
+        return  campaigns.stream().collect(Collectors.toList());
     }
 
 }

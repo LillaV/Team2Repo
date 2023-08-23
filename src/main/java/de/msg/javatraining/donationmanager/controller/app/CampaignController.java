@@ -3,8 +3,12 @@ package de.msg.javatraining.donationmanager.controller.app;
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
+import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.service.CampaignService;
+import de.msg.javatraining.donationmanager.service.utils.CampaignSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +21,20 @@ public class CampaignController {
 
     @Autowired
     private CampaignService campaignService;
-    @GetMapping()
-    public List<CampaignDto> getCampaigns(){
-        return campaignService.getCampaigns();
+
+    @Autowired
+    private CampaignSpecifications campaignSpecifications;
+
+    @GetMapping
+    public List<CampaignDto> getCampaigns(
+            @RequestParam(name = "offset", required = false) Integer offset,
+            @RequestParam(name = "pageSize", required = false) Integer pageSize) {
+        if (offset != null && pageSize != null){
+            return campaignService.allCampaignsWithPagination(offset, pageSize);
+        } else {
+            return campaignService.getCampaigns();
+        }
+
     }
 
     @PostMapping()
@@ -59,5 +74,19 @@ public class CampaignController {
         catch (Exception exception){
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
+    }
+
+    @GetMapping("/filter")
+    public List<Campaign> filterCampaigns(
+            @RequestParam(name = "offset") int offset,
+            @RequestParam(name = "pageSize") int pageSize,
+            @RequestParam(name = "nameTerm") String nameTerm,
+            @RequestParam(name = "purposeTerm") String purposeTerm
+    ){
+        Specification<Campaign> spec = campaignSpecifications.filterCampaigns(
+                nameTerm, purposeTerm
+        );
+
+        return campaignService.filterCampaignsWithPaging(spec, PageRequest.of(offset, pageSize));
     }
 }

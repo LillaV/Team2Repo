@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
+import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
@@ -20,17 +21,21 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/{offset}/{pageSize}")
-    public List<UserDto> getPage(@PathVariable(name = "offset") int offset,@PathVariable(name = "pageSize") int pageSize) {
-        return userService.allUsersWithPagination(offset, pageSize);
+    @GetMapping
+    public List<UserDto> getUsers(
+            @RequestParam(name = "offset", required = false) Integer offset,
+            @RequestParam(name = "pageSize", required = false) Integer pageSize) {
+        if (offset != null && pageSize != null){
+            return userService.allUsersWithPagination(offset, pageSize);
+        } else {
+            return userService.getAllUsers();
+        }
     }
 
-    @GetMapping()
-    public List<UserDto> getUsers(){
-        return userService.getAllUsers();
-    }
+    @GetMapping("/size")
+    public long getSize() { return userService.getSize();}
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public User getUserById(@PathVariable(name = "id") Long id){
         return  userService.findById(id);
     }

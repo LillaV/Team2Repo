@@ -82,4 +82,8 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
     public void setToUnknown(Long id){
         updateDonator(id, new SimpleDonatorDto("Unknown", "Unknown", "Unknown", "Unknown"));
     }
+
+    public long getSize(){
+        return factory.getDonatorRepository().count();
+    }
 }

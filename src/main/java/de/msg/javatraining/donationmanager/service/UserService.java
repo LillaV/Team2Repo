@@ -134,5 +134,9 @@ public class UserService {
     public List<UserDto> getAllUsers() {
         return  this.factory.getUserRepository().findAll().stream().map(userMapper::userToUserDto).collect(Collectors.toList());
     }
+
+    public long getSize(){
+        return factory.getUserRepository().count();
+    }
 }
 

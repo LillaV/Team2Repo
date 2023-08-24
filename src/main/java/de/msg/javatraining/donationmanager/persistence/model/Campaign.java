@@ -27,7 +27,7 @@ public class Campaign {
     private String name;
     @Column(nullable = false)
     private String purpose;
-    @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.PERSIST} , orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.PERSIST} , orphanRemoval = true,fetch = FetchType.EAGER)
     @JoinColumn(name = "donations")
     Set<Donation> donations;
 

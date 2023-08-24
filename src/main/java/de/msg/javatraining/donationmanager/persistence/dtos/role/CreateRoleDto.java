@@ -11,12 +11,12 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Setter
+
 @Getter
-@NoArgsConstructor
+@Setter
 @AllArgsConstructor
-public class RoleDto {
-    private Integer id;
+@NoArgsConstructor
+public class CreateRoleDto {
     private ERole name;
     private Set<PermissionDTO> permissions= new HashSet<>();
 }

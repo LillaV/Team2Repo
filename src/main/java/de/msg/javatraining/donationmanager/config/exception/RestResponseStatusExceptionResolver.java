@@ -76,4 +76,9 @@ public class RestResponseStatusExceptionResolver {
     private  ResponseEntity<String> handleUserDisabledException(){
         return new ResponseEntity<String>("Your account is disabled contact us for more info!",HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler({InvalidRequestException.class})
+    private  ResponseEntity<String> handleInvalidRequestException(InvalidRequestException exception){
+        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+    }
 }

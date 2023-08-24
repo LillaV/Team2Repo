@@ -8,7 +8,7 @@ public class LoadRolesForRegisterMapper {
         RoleDto roleDto = new RoleDto();
         roleDto.setId(role.getId());
         roleDto.setName(role.getName());
-        roleDto.setPermissions(role.getPermissions());
+        //roleDto.setPermissions(role.getPermissions());
         return roleDto;
     }
 }

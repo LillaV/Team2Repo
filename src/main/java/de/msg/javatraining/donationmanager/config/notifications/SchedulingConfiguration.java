@@ -1,6 +1,10 @@
 package de.msg.javatraining.donationmanager.config.notifications;
 
+import de.msg.javatraining.donationmanager.persistence.model.*;
+import de.msg.javatraining.donationmanager.persistence.model.enums.EPermission;
+import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
 import de.msg.javatraining.donationmanager.persistence.repository.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
@@ -8,12 +12,18 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static java.rmi.server.LogStream.log;
 
 @Configuration
 @EnableScheduling
+@Slf4j
 @ConditionalOnProperty(name ="scheduling.enable",matchIfMissing = false)
 public class SchedulingConfiguration {
 
@@ -43,6 +53,8 @@ public class SchedulingConfiguration {
 /*    @Scheduled(fixedRate = 30,timeUnit = TimeUnit.DAYS)
     @Transactional
     public void populateDB (){
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
         Random r = new Random();
         ERole[] roles = ERole.values();
         EPermission[] permissions = EPermission.values();
@@ -82,7 +94,11 @@ public class SchedulingConfiguration {
                     userCampaigns.add(campaign);
                 }
             }
-            User  user  = new User(names,names,true,true,names,"0745682905",names+"@yahoo.ro",userCampaigns, encoder.encode("password"),userRoles,0);
+            String password ="password";
+            byte[] messageDigest = md.digest(password.getBytes());
+            BigInteger no = new BigInteger(1, messageDigest);
+            String hashtext = no.toString(16);
+            User  user  = new User(names,names,true,true,names,"0745682905",names+"@yahoo.ro",userCampaigns,hashtext,userRoles,0);
             User user1 = userRepository.save(user);
              users.add(user1);
         }
@@ -110,6 +126,9 @@ public class SchedulingConfiguration {
             Campaign campaign = campaigns.get(campaignId);
             donation.setCampaign(campaign);
             donationRepository.save(donation);
+        }
+        } catch (NoSuchAlgorithmException e) {
+            log("Could  not   populate db because we couldn't get an instance of the  MD5 algorithm");
         }
     }*/
 }

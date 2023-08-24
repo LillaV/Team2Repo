@@ -4,7 +4,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class CustomPasswordEncoder implements PasswordEncoder {
-    private BCryptPasswordEncoder encoder;
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     @Override
     public String encode(CharSequence rawPassword) {
        return encoder.encode(rawPassword);

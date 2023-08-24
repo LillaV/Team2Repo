@@ -18,6 +18,19 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @GetMapping
+    public List<UserDto> getUsers(
+            @RequestParam(name = "offset", required = false) Integer offset,
+            @RequestParam(name = "pageSize", required = false) Integer pageSize) {
+        if (offset != null && pageSize != null){
+            return userService.allUsersWithPagination(offset, pageSize);
+        } else {
+            return userService.getAllUsers();
+        }
+    }
+
+    @GetMapping("/size")
+    public long getSize() { return userService.getSize();}
 
     @GetMapping("/{id}")
     public UserDto getUserById(@PathVariable(name = "id") Long id){
@@ -28,8 +41,6 @@ public class UserController {
     public TextResponse saveUser(@RequestBody CreateUserDto user) {
           return  userService.saveUser(user);
     }
-
-
     @PutMapping("/{id}/firstLogin")
     public TextResponse firstLoginChanges(@PathVariable("id") Long id, @RequestBody FirstLoginDto password){
             return userService.firstLogin(id,password);
@@ -55,13 +66,4 @@ public class UserController {
     public TextResponse  addCampaigns(@PathVariable("id") long userId, @RequestBody List<CampaignDto> campaigns){
         return this.userService.addCampaignsToREP(campaigns,userId);
     }
-    @GetMapping("/listing")
-    public List<UserDto> getPage(@RequestParam(name = "offset",required = false) Integer offset,@RequestParam(name = "pageSize",required = false) Integer pageSize) {
-        if(offset !=null && pageSize !=null) {
-            return userService.allUsersWithPagination(offset, pageSize);
-        }else{
-            return userService.getAllUsers();
-        }
-    }
-
 }

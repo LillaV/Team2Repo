@@ -148,6 +148,10 @@ public class UserService {
         return  this.factory.getUserRepository().findAll().stream().map(userMapper::userToUserDto).collect(Collectors.toList());
     }
 
+    public long getSize(){
+        return factory.getUserRepository().count();
+    }
+
     public TextResponse addCampaignsToREP(List<CampaignDto> campaigns,Long userID){
         Optional<User> foundUser = this.factory.getUserRepository().findById(userID);
         if(!foundUser.isPresent()){

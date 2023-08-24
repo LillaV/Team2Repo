@@ -120,8 +120,17 @@ public class NotificationService {
         return new NotificationPaginationDTO(notificationsList,usersNotificationsCnt/number);
     }
 
-    public List<NotificationDTO> recentNotifications(Long userId){
-        Page<Notification> notifications = notificationRepository.getUserNotifications(userId,PageRequest.of(0,3));
+//    public List<NotificationDTO> recentNotifications(Long userId){
+//        Page<Notification> notifications = notificationRepository.getUserNotifications(userId,PageRequest.of(0,3));
+//        return notifications.stream().map(mapper::notificationToNotificationDTO).collect(Collectors.toList());
+//    }
+
+    public List<NotificationDTO> getNotificationsWithPagination(Long userId, int offset, int pageSize){
+        Page<Notification> notifications = notificationRepository.getUserNotifications(userId, PageRequest.of(offset,pageSize));
         return notifications.stream().map(mapper::notificationToNotificationDTO).collect(Collectors.toList());
+    }
+
+    public long getSize(Long userId){
+        return notificationRepository.getAllUserNotifications(userId).size();
     }
 }

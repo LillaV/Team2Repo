@@ -6,7 +6,6 @@ import org.springframework.util.DigestUtils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import static java.rmi.server.LogStream.log;
 
 
 @Slf4j

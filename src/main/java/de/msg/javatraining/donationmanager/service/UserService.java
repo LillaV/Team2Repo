@@ -75,7 +75,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(pd.getPassword()));
         user.setNewUser(false);
         factory.getUserRepository().save(user);
-        return new TextResponse("PasswordChanged");
+        return new TextResponse("Password changed successfully");
     }
 
     public User toggleActivation(Long id){

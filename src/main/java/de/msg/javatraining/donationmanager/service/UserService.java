@@ -4,6 +4,7 @@ import de.msg.javatraining.donationmanager.config.notifications.events.DeletedUs
 import de.msg.javatraining.donationmanager.config.notifications.events.NewUserEvent;
 import de.msg.javatraining.donationmanager.config.notifications.events.UpdatedUserEvent;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
+import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,11 +66,16 @@ public class UserService {
         }
     }
 
-    public void firstLogin(Long id, FirstLoginDto pd){
-        User updatedUser=factory.getUserRepository().findById(id).get();
-        updatedUser.setPassword(passwordEncoder.encode(pd.getPassword()));
-        updatedUser.setNewUser(false);
-        factory.getUserRepository().save(updatedUser);
+    public TextResponse firstLogin(Long id, FirstLoginDto pd){
+        Optional<User> updatedUser=factory.getUserRepository().findById(id);
+        if(!updatedUser.isPresent()){
+            throw new UsernameNotFoundException("The user you are trying to change the password for  is not existent");
+        }
+        User user = updatedUser.get();
+        user.setPassword(passwordEncoder.encode(pd.getPassword()));
+        user.setNewUser(false);
+        factory.getUserRepository().save(user);
+        return new TextResponse("PasswordChanged");
     }
 
     public User toggleActivation(Long id){

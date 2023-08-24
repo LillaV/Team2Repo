@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
+import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
@@ -45,13 +46,8 @@ public class UserController {
         }
     }
     @PutMapping("/{id}/firstLogin")
-    public ResponseEntity firstLoginChanges(@PathVariable("id") Long id,@RequestBody FirstLoginDto password){
-        try{
-            userService.firstLogin(id,password);
-            return new ResponseEntity<>("User updated", HttpStatus.OK);
-        }catch (Exception exception){
-            return ResponseEntity.badRequest().body(exception.getMessage());
-        }
+    public TextResponse firstLoginChanges(@PathVariable("id") Long id, @RequestBody FirstLoginDto password){
+            return userService.firstLogin(id,password);
     }
 
     @PutMapping("/{id}/activation")

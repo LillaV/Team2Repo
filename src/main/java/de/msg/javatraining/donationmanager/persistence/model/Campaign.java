@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,6 +27,13 @@ public class Campaign {
     private String name;
     @Column(nullable = false)
     private String purpose;
+    @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.PERSIST} , orphanRemoval = true)
+    @JoinColumn(name = "donations")
+    Set<Donation> donations;
 
-
+    public Campaign(String name, String purpose, Set<Donation> donations) {
+        this.name = name;
+        this.purpose = purpose;
+        this.donations = donations;
+    }
 }

@@ -28,13 +28,13 @@ public class Donation {
     private LocalDate approvedDate;
     private String notes;
     @ManyToOne
-    @JoinColumn(name = "cuser_id")
+    @JoinColumn(name = "cuser_id", nullable = false)
     private User createdBy;
     @ManyToOne
     @JoinColumn(name = "auser_id")
     private User approvedBy;
     @ManyToOne
-    @JoinColumn(name = "campaign_id")
+    @JoinColumn(name="campaign_id", nullable=false)
     private Campaign campaign;
     @ManyToOne
     @JoinColumn(name = "donator_id")

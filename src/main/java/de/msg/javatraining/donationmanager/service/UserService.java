@@ -127,6 +127,7 @@ public class UserService {
     }
 
     public TextResponse saveUser(CreateUserDto userDto) {
+        System.out.println(userDto.getRoles().size());
         if (userDto.getRoles().size() > 0) {
             User userToSave = CreateUserMapper.createUserDtoToUser(userDto);
             if (userValidator.validate(userToSave)) {
@@ -137,8 +138,10 @@ public class UserService {
                 if (user != null) {
                     eventPublisher.publishEvent(new NewUserEvent(user));
                     serviceUtils.sendSimpleMessage(user, password);
+                    return new TextResponse("User created registered successfully!");
                 }
-
+            }else{
+                throw new InvalidRequestException("Invalid data!");
             }
         }
         throw new InvalidRequestException("You cannot save a user without any roles !");

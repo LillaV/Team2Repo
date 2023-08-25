@@ -1,8 +1,10 @@
 package de.msg.javatraining.donationmanager.config.exception;
 
+import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.PropertyValueException;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,7 +19,16 @@ public class RestResponseStatusExceptionResolver {
 
     @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class})
     private ResponseEntity<String> handleUniqueConstraintViolation(SQLIntegrityConstraintViolationException ex){
-        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+        String fullExMessage = ex.getMessage();
+        String message = fullExMessage.substring(fullExMessage.indexOf('['),fullExMessage.indexOf(']')+1);
+        return new ResponseEntity<>(message,HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = {DataIntegrityViolationException.class})
+    private ResponseEntity<String> handleDublicatedKeyException(DataIntegrityViolationException ex){
+        String fullExMessage = ex.getMessage();
+        String message = fullExMessage.substring(fullExMessage.indexOf('[')+1,fullExMessage.indexOf(']'));
+        return new ResponseEntity<>(message,HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {ConstraintViolationException.class})
@@ -78,7 +89,7 @@ public class RestResponseStatusExceptionResolver {
     }
 
     @ExceptionHandler({InvalidRequestException.class})
-    private  ResponseEntity<String> handleInvalidRequestException(InvalidRequestException exception){
-        return new ResponseEntity<String>(exception.getMessage(),HttpStatus.BAD_REQUEST);
+    private ResponseEntity<String> handleInvalidRequestException(InvalidRequestException exception){
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.BAD_REQUEST);
     }
 }

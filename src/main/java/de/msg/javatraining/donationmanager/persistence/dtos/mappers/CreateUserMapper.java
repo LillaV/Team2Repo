@@ -6,7 +6,6 @@ import de.msg.javatraining.donationmanager.persistence.model.Permission;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.model.enums.EPermission;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +14,9 @@ public interface CreateUserMapper {
 
     public static User createUserDtoToUser(CreateUserDto createUserDto){
         User user = new User();
+        user.setActive(true);
+        user.setFailedLoginAttempts(0);
+        user.setNewUser(true);
         user.setFirstName(createUserDto.getFirstName());
         user.setLastName(createUserDto.getLastName());
         user.setEmail(createUserDto.getEmail());
@@ -26,6 +28,7 @@ public interface CreateUserMapper {
         Set<Permission> defaultPermissionForCEN = new HashSet<>(Arrays.asList(new Permission(EPermission.AUTHORITY_BENEF_MANAGEMENT),new Permission(EPermission.AUTHORITY_DONATION_MANAGEMENT),
                 new Permission(EPermission.AUTHORITY_DONATION_REPORTING),new Permission(EPermission.AUTHORITY_CAMP_REPORTING)));
         Set<Permission> defaultPermissionsForREP = new HashSet<>(Arrays.asList(new Permission(EPermission.AUTHORITY_CAMP_REPORTING_RESTRICTED)));
+        Set<Role> roles = new HashSet<>();
         for(CreateRoleDto role : createUserDto.getRoles()){
             Role role1 = new Role();
             role1.setName(role.getName());
@@ -43,7 +46,9 @@ public interface CreateUserMapper {
                     role1.setPermissions(defaultPermissionsForREP);
                     break;
             }
+            roles.add(role1);
         }
+        user.setRoles(roles);
         user.setCampaigns(new HashSet<>());
         return user;
     }

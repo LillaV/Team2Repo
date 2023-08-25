@@ -40,6 +40,8 @@ public class UserService {
     UserValidator userValidator;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    private CreateUserMapper createUserMapper;
 
     public List<UserDto> allUsersWithPagination(int offset, int pageSize) {
         Page<User> users = factory.getUserRepository().findAll(PageRequest.of(offset, pageSize));
@@ -103,7 +105,7 @@ public class UserService {
                     campaigns.add(campaign.get());
                 }
             }
-            User userToSave = CreateUserMapper.createUserDtoToUser(userDto, roles, campaigns);
+            User userToSave = this.createUserMapper.createUserDtoToUser(userDto, roles, campaigns);
             String password = UserServiceUtils.generateUUID();
             userToSave.setPassword(password);
             if (userValidator.validate(userToSave)) {

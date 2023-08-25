@@ -8,7 +8,7 @@ import de.msg.javatraining.donationmanager.persistence.model.User;
 import java.util.Set;
 
 public class CreateUserMapper {
-    public static User createUserDtoToUser(CreateUserDto createUserDto, Set<Role> roles, Set<Campaign> campaigns){
+    public User createUserDtoToUser(CreateUserDto createUserDto, Set<Role> roles, Set<Campaign> campaigns){
         User user = new User();
         user.setFirstName(createUserDto.getFirstName());
         user.setLastName(createUserDto.getLastName());

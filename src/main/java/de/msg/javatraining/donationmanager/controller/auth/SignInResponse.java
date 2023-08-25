@@ -17,15 +17,15 @@ public class SignInResponse {
 	private String email;
 	private List<String> permissions;
 	private Boolean newUser;
-	private Boolean disabled;
+	private Boolean active;
 
-	public SignInResponse(String accessToken, Long id, String username, String email, List<String> permissions,Boolean newUser,Boolean disabled) {
+	public SignInResponse(String accessToken, Long id, String username, String email, List<String> permissions,Boolean newUser,Boolean active) {
 		this.token = accessToken;
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.permissions = permissions;
 		this.newUser = newUser;
-		this.disabled = disabled;
+		this.active = active;
 	}
 }

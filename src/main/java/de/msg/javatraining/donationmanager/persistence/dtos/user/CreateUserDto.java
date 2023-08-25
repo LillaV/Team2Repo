@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.persistence.dtos.user;
 
+import de.msg.javatraining.donationmanager.persistence.dtos.role.CreateRoleDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,5 @@ public class CreateUserDto {
     private String lastName;
     private String email;
     private String mobileNumber;
-    private Set<Long> rolesIDs = new HashSet<>();
-    private Set<Long> campaignIDs = new HashSet<>();
-
+    private Set<CreateRoleDto> roles = new HashSet<>();
 }

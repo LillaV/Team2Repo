@@ -71,28 +71,20 @@ public class AuthController {
     try{
       Authentication authentication = authenticationManager
               .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
       SecurityContextHolder.getContext().setAuthentication(authentication);
-
       UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
       User user = this.userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
-
       String jwt = jwtUtils.generateJwtToken(userDetails);
-
       List<String> permissions = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
               .collect(Collectors.toList());
-
       String refreshToken = UUID.randomUUID().toString();
       refreshTokenService.deleteRefreshTokenForUser(userDetails.getId());
       refreshTokenService.createRefreshToken(refreshToken, userDetails.getId());
       HttpHeaders headers = new HttpHeaders();
-
       user.setFailedLoginAttempts(0);
       headers.add(HttpHeaders.SET_COOKIE, createCookie(refreshToken).toString());
       return new ResponseEntity<>(new SignInResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), permissions,userDetails.isNewUser(),userDetails.isEnabled()), headers, HttpStatus.OK);
-    }
-    catch (BadCredentialsException e){
+    } catch (BadCredentialsException e){
         User user = this.userRepository.findByUsername(loginRequest.getUsername()).orElseThrow();
         user.setFailedLoginAttempts(user.getFailedLoginAttempts()+1);
         if(user.getFailedLoginAttempts() >= 5){
@@ -101,14 +93,10 @@ public class AuthController {
             this.userRepository.save(user);
             eventPublisher.publishEvent(new UserDeactivatedEvent(user));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Your account is currently deactivated!");
-
         }
-
         this.userRepository.save(user);
-
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.UNAUTHORIZED);
+        throw e;
     }
-
   }
 
   @GetMapping("/refreshToken")

@@ -2,6 +2,7 @@ package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.permission.PermissionDTO;
 import de.msg.javatraining.donationmanager.persistence.dtos.permission.RolePermissionsDTO;
+import de.msg.javatraining.donationmanager.persistence.dtos.role.CreateRoleDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.role.RoleDto;
 import de.msg.javatraining.donationmanager.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class RoleController {
     private RoleService roleService;
 
     @GetMapping
-    public List<RoleDto> findAll(){
+    public List<CreateRoleDto> findAll(){
         return roleService.findAll();
     }
 

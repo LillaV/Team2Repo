@@ -5,10 +5,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.notification.Notific
 import de.msg.javatraining.donationmanager.persistence.model.Notification;
 import de.msg.javatraining.donationmanager.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,8 +19,24 @@ public class NotificationController {
         return service.getNotifications(load,number,userId);
     }
 
+//    @GetMapping("/{userId}")
+//    public List<NotificationDTO> myNotifications(@PathVariable("userId") Long userId){
+//        //return service.recentNotifications(userId);
+//        return service.getNotificationsWithPagination(userId, 0, 3);
+//    }
+//
     @GetMapping("/{userId}")
-    public List<NotificationDTO> myNotifications(@PathVariable("userId") Long userId){
-        return service.recentNotifications(userId);
+    public List<NotificationDTO> myNotifications(
+            @PathVariable("userId") Long userId,
+            @RequestParam(name = "offset", required = false) Integer offset,
+            @RequestParam(name = "pageSize", required = false) Integer pageSize){
+        if (offset != null && pageSize != null) {
+            return service.getNotificationsWithPagination(userId,offset,pageSize);
+        } else {
+            return service.getNotificationsWithPagination(userId, 0, 3);
+        }
     }
+
+    @GetMapping("/size/{userId}")
+    public long getSize(@PathVariable("userId") Long userId) { return service.getSize(userId);}
 }

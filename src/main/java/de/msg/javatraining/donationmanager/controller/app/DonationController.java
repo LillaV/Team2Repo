@@ -2,10 +2,12 @@ package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.UserMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import de.msg.javatraining.donationmanager.persistence.model.DonationFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.User;
+import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
 import de.msg.javatraining.donationmanager.service.DonationService;
 import de.msg.javatraining.donationmanager.service.UserService;
 import de.msg.javatraining.donationmanager.service.filter.DonationSpecifications;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/donations")
@@ -26,12 +29,10 @@ public class DonationController {
     private DonationService donationService;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private DonationSpecifications donationSpecifications;
-
     @Autowired
+    private UserRepository userRepository;
+
 
     @GetMapping("/currencies")
     public List<String> getCurrencies(){
@@ -83,9 +84,9 @@ public class DonationController {
     public ResponseEntity approveDonation(@RequestParam(name = "donationId") Long donationId,
                                           @RequestParam(name = "approvedById") Long approvedById){
         Donation donation = donationService.findById(donationId);
-        User approvedBy = userService.findById(approvedById);
-        if (donation.getCreatedBy().getId() != approvedById){
-            donationService.approveDonation(donation, approvedBy);
+        Optional<User> approvedBy = userRepository.findById(approvedById);
+        if (donation.getCreatedBy().getId() != approvedById && approvedBy.isPresent()){
+            donationService.approveDonation(donation, approvedBy.get());
             return new ResponseEntity<>("Donation approved successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("4 Augen Prinzip is violated", HttpStatus.BAD_REQUEST);

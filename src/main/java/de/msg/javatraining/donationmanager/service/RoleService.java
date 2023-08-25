@@ -4,19 +4,21 @@ import de.msg.javatraining.donationmanager.config.exception.RoleNotFoundExceptio
 import de.msg.javatraining.donationmanager.config.exception.UserNotFoundException;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.LoadRolesForRegisterMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.PermissionMaper;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.RoleMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.permission.PermissionDTO;
 import de.msg.javatraining.donationmanager.persistence.dtos.permission.RolePermissionsDTO;
+import de.msg.javatraining.donationmanager.persistence.dtos.role.CreateRoleDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.role.RoleDto;
 import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Permission;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
+import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
+import org.mapstruct.control.MappingControl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,15 +29,12 @@ public class RoleService {
     IUserServiceFactory factory;
     @Autowired
     PermissionMaper mapper;
+    @Autowired
+    RoleMapper roleMapper;
 
-    public List<RoleDto> findAll() {
-        List<Role> roles = this.factory.getRoleRepository().findAll();
-        List<RoleDto> roleDtos = new ArrayList<>();
-        for (Role role : roles) {
-            RoleDto roleDto = LoadRolesForRegisterMapper.roleToRoleDto(role);
-            roleDtos.add(roleDto);
-        }
-        return roleDtos;
+    public List<CreateRoleDto> findAll() {
+        List<ERole> roles = List.of(ERole.values());
+        return roles.stream().map(ERole -> new CreateRoleDto(ERole,new HashSet<PermissionDTO>())).collect(Collectors.toList());
     }
 
     public String addPermission(Set<PermissionDTO> permissionDTOS,Long roleId){

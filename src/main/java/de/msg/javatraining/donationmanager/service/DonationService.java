@@ -4,11 +4,11 @@ import de.msg.javatraining.donationmanager.config.notifications.events.DonationA
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonationMapper;
-import de.msg.javatraining.donationmanager.persistence.factories.IDonationServiceFactory;
-import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import de.msg.javatraining.donationmanager.persistence.model.DonationFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.User;
+import de.msg.javatraining.donationmanager.persistence.repository.DonationRepository;
+import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
 import de.msg.javatraining.donationmanager.service.security.UserDetailsImpl;
 import de.msg.javatraining.donationmanager.service.validation.DonationValidator;
 import jakarta.transaction.Transactional;
@@ -30,10 +30,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class DonationService {
     @Autowired
-    IDonationServiceFactory factory;
+    DonationRepository donationRepository;
 
     @Autowired
-    IUserServiceFactory userFactory;
+    UserRepository userRepository;
 
     @Autowired
     DonationMapper donationMapper;
@@ -44,13 +44,13 @@ public class DonationService {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    public List<Donation> allDonationsWithPagination(int offset, int pageSize){
-        Page<Donation> donations =  factory.getDonationRepository().findAll(PageRequest.of(offset, pageSize));
+    public List<Donation> allDonationsWithPagination(int offset, int pageSize) {
+        Page<Donation> donations = donationRepository.findAll(PageRequest.of(offset, pageSize));
         return donations.stream().collect(Collectors.toList());
     }
 
     public Donation findById(Long id) {
-        return factory.getDonationRepository().findById(id).get();
+        return donationRepository.findById(id).get();
     }
 
     public void saveDonation(SimpleDonationDto simpleDonationDto) {
@@ -58,7 +58,7 @@ public class DonationService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        User creatorUser = this.userFactory.getUserRepository().findByUsername(userDetails.getUsername()).orElseThrow();
+        User creatorUser = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
 
         donationToSave.setCreatedBy(creatorUser);
         donationToSave.setCreateDate(LocalDate.now());
@@ -66,12 +66,12 @@ public class DonationService {
 
         donationValidator.validate(donationToSave);
 
-        factory.getDonationRepository().save(donationToSave);
+        donationRepository.save(donationToSave);
     }
 
 
     public void updateDonation(Long id, UpdateDonationDto updateDonationDto) {
-        Donation updatedDonation = factory.getDonationRepository().findById(id).get();
+        Donation updatedDonation = donationRepository.findById(id).get();
         updatedDonation.setAmount(updateDonationDto.getAmount());
         updatedDonation.setCurrency(updateDonationDto.getCurrency());
         updatedDonation.setCampaign(updateDonationDto.getCampaign());
@@ -80,38 +80,38 @@ public class DonationService {
 
         donationValidator.validate(updatedDonation);
 
-        factory.getDonationRepository().save(updatedDonation);
+        donationRepository.save(updatedDonation);
     }
 
-    public void deleteDonation(Long id){
-        factory.getDonationRepository().deleteById(id);
+    public void deleteDonation(Long id) {
+        donationRepository.deleteById(id);
     }
 
-    public void approveDonation(Donation donation, User approvedBy){
-            donation.setApproved(true);
-            donation.setApprovedBy(approvedBy);
-            donation.setApprovedDate(LocalDate.now());
-            factory.getDonationRepository().save(donation);
-            eventPublisher.publishEvent(new DonationApprovedEvent(donation));
+    public void approveDonation(Donation donation, User approvedBy) {
+        donation.setApproved(true);
+        donation.setApprovedBy(approvedBy);
+        donation.setApprovedDate(LocalDate.now());
+        donationRepository.save(donation);
+        eventPublisher.publishEvent(new DonationApprovedEvent(donation));
     }
 
     public DonationFilterPair filterDonationsWithPaging(Specification<Donation> spec, Pageable pageable) {
 
-        int size =  factory.getDonationRepository().findAll(spec).size();
-        Page<Donation> donations =  factory.getDonationRepository().findAll(
+        int size = donationRepository.findAll(spec).size();
+        Page<Donation> donations = donationRepository.findAll(
                 spec,
                 pageable
         );
 
-        return new DonationFilterPair(donations.stream().collect(Collectors.toList()), size) ;
+        return new DonationFilterPair(donations.stream().collect(Collectors.toList()), size);
     }
 
-    public List<String> getCurrencies(){
-        return factory.getDonationRepository().getDistinctCurrencies();
+    public List<String> getCurrencies() {
+        return donationRepository.getDistinctCurrencies();
     }
 
-    public long getSize(){
-        return  factory.getDonationRepository().count();
+    public long getSize() {
+        return donationRepository.count();
     }
 
 }

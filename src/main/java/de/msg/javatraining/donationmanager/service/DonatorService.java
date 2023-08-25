@@ -4,8 +4,8 @@ import de.msg.javatraining.donationmanager.persistence.dtos.donator.SimpleDonato
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonatorMapper;
 import de.msg.javatraining.donationmanager.persistence.factories.IDonatorServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
-import de.msg.javatraining.donationmanager.persistence.model.Role;
-import de.msg.javatraining.donationmanager.persistence.model.User;
+import de.msg.javatraining.donationmanager.persistence.repository.DonationRepository;
+import de.msg.javatraining.donationmanager.persistence.repository.DonatorRepository;
 import de.msg.javatraining.donationmanager.service.validation.DonatorValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,49 +22,54 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class DonatorService {
+
     @Autowired
-    IDonatorServiceFactory factory;
+    DonatorRepository donatorRepository;
 
     @Autowired
     DonatorMapper donatorMapper;
 
     @Autowired
     DonatorValidator donatorValidator;
+
+    @Autowired
+    DonationRepository donationRepository;
+
     public List<Donator> allDonatorsWithPagination(int offset, int pageSize){
-        Page<Donator> donators =  factory.getDonatorRepository().findAll(PageRequest.of(offset, pageSize));
+        Page<Donator> donators =  donatorRepository.findAll(PageRequest.of(offset, pageSize));
         return donators.stream().collect(Collectors.toList());
     }
 
     public List<Donator> getDonators(){
-        return factory.getDonatorRepository().findAll();
+        return donatorRepository.findAll();
     }
 
     public Donator updateDonator(Long id, SimpleDonatorDto simpleDonatorDto) {
-        Donator updatedDonator = factory.getDonatorRepository().findById(id).get();
+        Donator updatedDonator = donatorRepository.findById(id).get();
         updatedDonator.setFirstName(simpleDonatorDto.getFirstName());
         updatedDonator.setLastName(simpleDonatorDto.getLastName());
         updatedDonator.setAdditionalName(simpleDonatorDto.getAdditionalName());
         updatedDonator.setMaidenName(simpleDonatorDto.getMaidenName());
-        factory.getDonatorRepository().save(updatedDonator);
+        donatorRepository.save(updatedDonator);
         return updatedDonator;
     }
 
     public void deleteDonatorById(Long id) {
-        if(factory.getDonationRepository().existsByBenefactorId(id)){
-            factory.getDonationRepository().deleteBenefactorId(id);
+        if(donationRepository.existsByBenefactorId(id)){
+            donationRepository.deleteBenefactorId(id);
         }
 
-        factory.getDonatorRepository().deleteById(id);
+        donatorRepository.deleteById(id);
     }
 
 public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
     Donator donator = donatorMapper.SimpleDonatorDtoToDonator(simpleDonatorDto);
 
     // Check if the donator already exists based on first name, last name, additional name, and maiden name
-    if (!factory.getDonatorRepository().existsByFirstNameAndLastNameAndAdditionalNameAndMaidenName(
+    if (!donatorRepository.existsByFirstNameAndLastNameAndAdditionalNameAndMaidenName(
             donator.getFirstName(), donator.getLastName(), donator.getAdditionalName(), donator.getMaidenName())) {
         if (donatorValidator.validate(donator)) {
-            factory.getDonatorRepository().save(donator);
+            donatorRepository.save(donator);
         } else {
             System.out.println("Cannot save");
         }
@@ -74,7 +79,7 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
 }
 
     public Donator findById(Long id) {
-        return factory.getDonatorRepository().findById(id).get();
+        return donatorRepository.findById(id).get();
     }
 
 
@@ -84,6 +89,6 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
     }
 
     public long getSize(){
-        return factory.getDonatorRepository().count();
+        return donatorRepository.count();
     }
 }

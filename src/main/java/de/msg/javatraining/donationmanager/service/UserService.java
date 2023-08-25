@@ -1,9 +1,15 @@
 package de.msg.javatraining.donationmanager.service;
 
+import de.msg.javatraining.donationmanager.config.exception.InvalidRequestException;
+import de.msg.javatraining.donationmanager.config.exception.UserNotFoundException;
 import de.msg.javatraining.donationmanager.config.notifications.events.DeletedUserEvent;
 import de.msg.javatraining.donationmanager.config.notifications.events.NewUserEvent;
 import de.msg.javatraining.donationmanager.config.notifications.events.UpdatedUserEvent;
+import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CampaignMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.RoleMapper;
+import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
@@ -11,14 +17,18 @@ import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.UserMapper;
 import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
+import de.msg.javatraining.donationmanager.persistence.model.Permission;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
+import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
 import de.msg.javatraining.donationmanager.service.utils.UserServiceUtils;
 import de.msg.javatraining.donationmanager.service.validation.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +41,8 @@ public class UserService {
     @Autowired
     UserMapper userMapper;
     @Autowired
+    RoleMapper roleMapper;
+    @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
     UserServiceUtils serviceUtils;
@@ -40,6 +52,8 @@ public class UserService {
     UserValidator userValidator;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    private CampaignMapper campaignMapper;
 
     public List<UserDto> allUsersWithPagination(int offset, int pageSize) {
         Page<User> users = factory.getUserRepository().findAll(PageRequest.of(offset, pageSize));
@@ -47,85 +61,118 @@ public class UserService {
     }
 
 
-    public void updateUser(Long id, UpdateUserDto updateUserDto) {
-        User updatedUser = factory.getUserRepository().findById(id).get();
+    public TextResponse updateUser(Long id, UpdateUserDto updateUserDto) {
+        Optional<User> updatedUser = factory.getUserRepository().findById(id);
+        if(!updatedUser.isPresent()){
+            throw new UsernameNotFoundException("The user you are trying to  update doesn't exists!");
+        }
+        User userToBeUpdated =  updatedUser.get();
         String beforeUpdate = updatedUser.toString();
-        updatedUser.setFirstName(updateUserDto.getFirstName());
-        updatedUser.setLastName(updateUserDto.getLastName());
-        updatedUser.setActive(updateUserDto.isActive());
-        updatedUser.setNewUser(updateUserDto.isNewUser());
-        updatedUser.setEmail(updateUserDto.getEmail());
-        updatedUser.setMobileNumber(updateUserDto.getMobileNumber());
-        updatedUser.setRoles(updateUserDto.getRoles());
-        if (userValidator.validate(updatedUser)) {User user = factory.getUserRepository().save(updatedUser);
+        userToBeUpdated.setFirstName(updateUserDto.getFirstName());
+        userToBeUpdated.setLastName(updateUserDto.getLastName());
+        userToBeUpdated.setActive(updateUserDto.isActive());
+        userToBeUpdated.setNewUser(updateUserDto.isNewUser());
+        userToBeUpdated.setEmail(updateUserDto.getEmail());
+        userToBeUpdated.setMobileNumber(updateUserDto.getMobileNumber());
+        userToBeUpdated.setRoles(updateUserDto.getRoles().stream().map(roleMapper::roleDtoToRole).collect(Collectors.toSet()));
+        if (userValidator.validate(userToBeUpdated)) {
+            User user = factory.getUserRepository().save(userToBeUpdated);
             if(user != null){
                 eventPublisher.publishEvent(new UpdatedUserEvent(user.toString(),beforeUpdate,user.getUsername()));
+                return new TextResponse("User  updated successfully!");
             }
         }
+        return new TextResponse("The user couldn't be updated");
     }
 
-    public void firstLogin(Long id, FirstLoginDto pd){
-        User updatedUser=factory.getUserRepository().findById(id).get();
-        updatedUser.setPassword(passwordEncoder.encode(pd.getPassword()));
-        updatedUser.setNewUser(false);
-        factory.getUserRepository().save(updatedUser);
+    public TextResponse firstLogin(Long id, FirstLoginDto pd){
+        Optional<User> updatedUser=factory.getUserRepository().findById(id);
+        if(!updatedUser.isPresent()){
+            throw new UsernameNotFoundException("The user you are trying to change the password for  is not existent");
+        }
+        User user = updatedUser.get();
+        user.setPassword(passwordEncoder.encode(pd.getPassword()));
+        user.setNewUser(false);
+        factory.getUserRepository().save(user);
+        return new TextResponse("Password changed successfully");
     }
 
-    public User toggleActivation(Long id){
+    public TextResponse toggleActivation(Long id){
+        boolean activation = false;
         User updatedUser = factory.getUserRepository().findById(id).get();
+        if(!updatedUser.isActive()){
+            activation = true;
+        }
         updatedUser.setActive(!updatedUser.isActive());
         User user = factory.getUserRepository().save(updatedUser);
-        eventPublisher.publishEvent(new DeletedUserEvent(user));
-        return updatedUser;
+        if(!activation) {
+            eventPublisher.publishEvent(new DeletedUserEvent(user));
+            return new TextResponse("User deactivated successfully");
+        }else{
+            return new TextResponse("User activated successfully");
+        }
     }
 
-    public User findById(Long id) {
-        return factory.getUserRepository().findById(id).get();
+    public UserDto findById(Long id) {
+        Optional<User> user =  factory.getUserRepository().findById(id);
+        if(user.isPresent()){
+            return userMapper.userToUserDto(user.get());
+        }
+        throw new UserNotFoundException("There is no user  with the id = " + id);
     }
 
-    public void deleteUserById(Long id) {
+    public TextResponse deleteUserById(Long id) {
         factory.getUserRepository().deleteById(id);
+        return new TextResponse("User deleted successfully !");
     }
 
-    public void saveUser(CreateUserDto userDto) {
-        if (userDto.getRolesIDs().size() != 0) {
-            Set<Role> roles = new HashSet<>();
-            Set<Campaign> campaigns = new HashSet<>();
-            for (long id : userDto.getRolesIDs()) {
-                Optional<Role> role = factory.getRoleRepository().findById(id);
-                if (role.isPresent()) {
-                    roles.add(role.get());
-                }
-            }
-            for (long id : userDto.getCampaignIDs()) {
-                Optional<Campaign> campaign = factory.getCampaignRepository().findById(id);
-                if (campaign.isPresent()) {
-                    campaigns.add(campaign.get());
-                }
-            }
-            User userToSave = CreateUserMapper.createUserDtoToUser(userDto, roles, campaigns);
-            String password = UserServiceUtils.generateUUID();
-            userToSave.setPassword(password);
+    public TextResponse saveUser(CreateUserDto userDto) {
+        System.out.println(userDto.getRoles().size());
+        if (userDto.getRoles().size() > 0) {
+            User userToSave = CreateUserMapper.createUserDtoToUser(userDto);
             if (userValidator.validate(userToSave)) {
                 userToSave.setUsername(serviceUtils.generateUsername(userToSave, factory.getUserRepository().findAll()));
+                String password = serviceUtils.generateUUID();
+                userToSave.setPassword(passwordEncoder.encode(password));
                 User user = factory.getUserRepository().save(userToSave);
                 if (user != null) {
-                    System.out.println("Am ajuns aici");
                     eventPublisher.publishEvent(new NewUserEvent(user));
                     serviceUtils.sendSimpleMessage(user, password);
+                    return new TextResponse("User created registered successfully!");
                 }
-
-            } else {
-                System.out.println("Cannot save");
+            }else{
+                throw new InvalidRequestException("Invalid data!");
             }
-
-        } else {
-            System.out.println("Cannot save, user must have at least 1 role");
         }
+        throw new InvalidRequestException("You cannot save a user without any roles !");
     }
 
     public List<UserDto> getAllUsers() {
         return  this.factory.getUserRepository().findAll().stream().map(userMapper::userToUserDto).collect(Collectors.toList());
+    }
+
+    public long getSize(){
+        return factory.getUserRepository().count();
+    }
+
+    public TextResponse addCampaignsToREP(List<CampaignDto> campaigns,Long userID){
+        Optional<User> foundUser = this.factory.getUserRepository().findById(userID);
+        if(!foundUser.isPresent()){
+            throw new  UserNotFoundException("The user you are trying to add the campaigns does not exists!");
+        }
+        User user = foundUser.get();
+        boolean hasRoleREP = false;
+        for(Role role : user.getRoles()){
+            if(role.getName().name().equals(ERole.REP.name())){
+                hasRoleREP = true;
+            }
+        }
+        if(!hasRoleREP){
+            throw new   InvalidRequestException("The user doesn't have  the  necessary role!");
+        }
+        user.getCampaigns().addAll(campaigns.stream().map(campaignMapper::campaignDtoToCampaign).collect(Collectors.toSet()));
+        factory.getUserRepository().save(user);
+        return new TextResponse("The  campaigns were added successfully!");
     }
 }
 

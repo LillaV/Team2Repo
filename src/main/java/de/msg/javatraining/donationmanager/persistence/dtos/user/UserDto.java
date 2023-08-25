@@ -1,5 +1,7 @@
 package de.msg.javatraining.donationmanager.persistence.dtos.user;
 
+import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.role.RoleDto;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,6 @@ public class UserDto {
     private Boolean newUser;
     private String email;
     private String mobileNumber;
-    private Set<Role> roles = new HashSet<>();
-    private Set<Campaign> campaigns;
+    private Set<RoleDto> roles = new HashSet<>();
+    private Set<CampaignDto> campaigns;
 }

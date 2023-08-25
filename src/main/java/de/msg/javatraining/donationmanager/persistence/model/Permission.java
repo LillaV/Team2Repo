@@ -22,4 +22,8 @@ public class Permission {
     @Column(length = 40)
     private EPermission permission;
 
+    public Permission(EPermission permission) {
+        this.permission = permission;
+    }
+
 }

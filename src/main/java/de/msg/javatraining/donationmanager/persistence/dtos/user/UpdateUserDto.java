@@ -1,5 +1,7 @@
 package de.msg.javatraining.donationmanager.persistence.dtos.user;
 
+import de.msg.javatraining.donationmanager.persistence.dtos.role.CreateRoleDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.role.RoleDto;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import jakarta.persistence.*;
@@ -22,5 +24,5 @@ public class UpdateUserDto {
     private boolean newUser;
     private String email;
     private String mobileNumber;
-    private Set<Role> roles = new HashSet<>();
+    private Set<RoleDto> roles = new HashSet<>();
 }

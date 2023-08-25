@@ -2,9 +2,12 @@ package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.UserMapper;
+import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import de.msg.javatraining.donationmanager.persistence.model.DonationFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.User;
+import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
 import de.msg.javatraining.donationmanager.service.DonationService;
 import de.msg.javatraining.donationmanager.service.UserService;
 import de.msg.javatraining.donationmanager.service.filter.DonationSpecifications;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/donations")
@@ -25,12 +29,10 @@ public class DonationController {
     private DonationService donationService;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private DonationSpecifications donationSpecifications;
-
     @Autowired
+    private UserRepository userRepository;
+
 
     @GetMapping("/currencies")
     public List<String> getCurrencies(){
@@ -48,23 +50,23 @@ public class DonationController {
     }
 
     @PostMapping()
-    public ResponseEntity<String> saveDonation(@RequestBody SimpleDonationDto donationDto) {
+    public TextResponse saveDonation(@RequestBody SimpleDonationDto donationDto) {
         try{
             donationService.saveDonation(donationDto);
-            return new ResponseEntity<>("Donation saved", HttpStatus.OK);
+            return new TextResponse("Donation added");
         }
         catch (Exception exception){
-            return ResponseEntity.badRequest().body(exception.getMessage());
+            return new TextResponse(exception.getMessage());
         }
     }
     @PutMapping("/{id}")
-    public ResponseEntity updateDonation(@RequestBody() UpdateDonationDto updateDonationDto, @PathVariable("id") Long id) {
+    public TextResponse updateDonation(@RequestBody() UpdateDonationDto updateDonationDto, @PathVariable("id") Long id) {
         Donation donation = donationService.findById(id);
         if(!donation.isApproved()){
             donationService.updateDonation(id, updateDonationDto);
-            return new ResponseEntity<>( "Donation updated", HttpStatus.OK);
+            return new TextResponse( "Donation updated");
         } else {
-            return new ResponseEntity<>("Donation is already approved, you cannot edit it anymore.", HttpStatus.FORBIDDEN);
+            return new TextResponse("Donation is already approved, you cannot edit it anymore.");
         }
     }
     @DeleteMapping("/{id}")
@@ -82,9 +84,9 @@ public class DonationController {
     public ResponseEntity approveDonation(@RequestParam(name = "donationId") Long donationId,
                                           @RequestParam(name = "approvedById") Long approvedById){
         Donation donation = donationService.findById(donationId);
-        User approvedBy = userService.findById(approvedById);
-        if (donation.getCreatedBy().getId() != approvedById){
-            donationService.approveDonation(donation, approvedBy);
+        Optional<User> approvedBy = userRepository.findById(approvedById);
+        if (donation.getCreatedBy().getId() != approvedById && approvedBy.isPresent()){
+            donationService.approveDonation(donation, approvedBy.get());
             return new ResponseEntity<>("Donation approved successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("4 Augen Prinzip is violated", HttpStatus.BAD_REQUEST);

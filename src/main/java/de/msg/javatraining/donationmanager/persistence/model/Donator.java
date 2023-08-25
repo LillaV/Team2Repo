@@ -25,4 +25,11 @@ public class Donator {
     private String lastName;
     private String additionalName;
     private String maidenName;
+
+    public Donator(String firstName, String lastName, String additionalName, String maidenName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.additionalName = additionalName;
+        this.maidenName = maidenName;
+    }
 }

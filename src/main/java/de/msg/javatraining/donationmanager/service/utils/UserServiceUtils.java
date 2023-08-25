@@ -34,7 +34,7 @@ public class UserServiceUtils {
         return username;
     }
 
-    public static String generateUUID(){
+    public String generateUUID(){
         UUID uuid=UUID.randomUUID();
         return uuid.toString();
     }

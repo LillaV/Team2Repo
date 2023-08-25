@@ -3,7 +3,6 @@ package de.msg.javatraining.donationmanager.service;
 import de.msg.javatraining.donationmanager.persistence.dtos.donator.SimpleDonatorDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonatorMapper;
 import de.msg.javatraining.donationmanager.persistence.factories.IDonatorServiceFactory;
-import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
@@ -34,6 +33,10 @@ public class DonatorService {
     public List<Donator> allDonatorsWithPagination(int offset, int pageSize){
         Page<Donator> donators =  factory.getDonatorRepository().findAll(PageRequest.of(offset, pageSize));
         return donators.stream().collect(Collectors.toList());
+    }
+
+    public List<Donator> getDonators(){
+        return factory.getDonatorRepository().findAll();
     }
 
     public Donator updateDonator(Long id, SimpleDonatorDto simpleDonatorDto) {
@@ -78,5 +81,9 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
 
     public void setToUnknown(Long id){
         updateDonator(id, new SimpleDonatorDto("Unknown", "Unknown", "Unknown", "Unknown"));
+    }
+
+    public long getSize(){
+        return factory.getDonatorRepository().count();
     }
 }

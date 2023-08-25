@@ -2,7 +2,6 @@ package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.donator.SimpleDonatorDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonatorMapper;
-import de.msg.javatraining.donationmanager.persistence.factories.IDonatorServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.persistence.repository.DonationRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.DonatorRepository;
@@ -13,10 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

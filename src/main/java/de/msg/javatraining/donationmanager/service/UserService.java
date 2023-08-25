@@ -64,6 +64,9 @@ public class UserService {
         if(!updatedUser.isPresent()){
             throw new UsernameNotFoundException("The user you are trying to  update doesn't exists!");
         }
+        if (updateUserDto.getRoles().size() == 0) {
+            throw new InvalidRequestException("You cannot remove all the roles from an user!");
+        }
         User userToBeUpdated =  updatedUser.get();
         String beforeUpdate = updatedUser.toString();
         userToBeUpdated.setFirstName(updateUserDto.getFirstName());
@@ -123,7 +126,6 @@ public class UserService {
     }
 
     public TextResponse saveUser(CreateUserDto userDto) {
-        System.out.println(userDto.getRoles().size());
         if (userDto.getRoles().size() > 0) {
             User userToSave = CreateUserMapper.createUserDtoToUser(userDto);
             if (userValidator.validate(userToSave)) {

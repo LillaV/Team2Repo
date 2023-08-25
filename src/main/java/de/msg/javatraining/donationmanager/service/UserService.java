@@ -21,6 +21,7 @@ import de.msg.javatraining.donationmanager.persistence.model.Permission;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
+import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
 import de.msg.javatraining.donationmanager.service.utils.UserServiceUtils;
 import de.msg.javatraining.donationmanager.service.validation.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,9 +54,11 @@ public class UserService {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
     @Autowired
-    private CreateUserMapper createUserMapper;
+    CreateUserMapper createUserMapper;
     @Autowired
-    private CampaignMapper campaignMapper;
+    CampaignMapper campaignMapper;
+    @Autowired
+    UserRepository userRepository;
 
     public List<UserDto> allUsersWithPagination(int offset, int pageSize) {
         Page<User> users = factory.getUserRepository().findAll(PageRequest.of(offset, pageSize));
@@ -64,7 +67,7 @@ public class UserService {
 
 
     public TextResponse updateUser(Long id, UpdateUserDto updateUserDto) {
-        Optional<User> updatedUser = factory.getUserRepository().findById(id);
+        Optional<User> updatedUser = userRepository.findById(id);
         if(!updatedUser.isPresent()){
             throw new UsernameNotFoundException("The user you are trying to  update doesn't exists!");
         }
@@ -131,12 +134,12 @@ public class UserService {
     public TextResponse saveUser(CreateUserDto userDto) {
         System.out.println(userDto.getRoles().size());
         if (userDto.getRoles().size() > 0) {
-            User userToSave = CreateUserMapper.createUserDtoToUser(userDto);
+            User userToSave = createUserMapper.createUserDtoToUser(userDto);
             if (userValidator.validate(userToSave)) {
-                userToSave.setUsername(serviceUtils.generateUsername(userToSave, factory.getUserRepository().findAll()));
+                userToSave.setUsername(serviceUtils.generateUsername(userToSave, userRepository.findAll()));
                 String password = serviceUtils.generateUUID();
                 userToSave.setPassword(passwordEncoder.encode(password));
-                User user = factory.getUserRepository().save(userToSave);
+                User user = userRepository.save(userToSave);
                 if (user != null) {
                     eventPublisher.publishEvent(new NewUserEvent(user));
                     serviceUtils.sendSimpleMessage(user, password);

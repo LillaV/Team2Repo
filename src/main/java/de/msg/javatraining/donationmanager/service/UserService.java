@@ -68,7 +68,7 @@ public class UserService {
             throw new InvalidRequestException("You cannot remove all the roles from an user!");
         }
         User userToBeUpdated =  updatedUser.get();
-        String beforeUpdate = updatedUser.toString();
+        String beforeUpdate = userToBeUpdated.toString();
         userToBeUpdated.setFirstName(updateUserDto.getFirstName());
         userToBeUpdated.setLastName(updateUserDto.getLastName());
         userToBeUpdated.setActive(updateUserDto.isActive());
@@ -79,7 +79,7 @@ public class UserService {
         if (userValidator.validate(userToBeUpdated)) {
             User user = factory.getUserRepository().save(userToBeUpdated);
             eventPublisher.publishEvent(new UpdatedUserEvent(user.toString(),beforeUpdate,user.getUsername()));
-            return new TextResponse("User  updated successfully!");
+            return new TextResponse("User updated successfully!");
         }
         throw new InvalidRequestException("Invalid data!");
     }

@@ -9,15 +9,13 @@ import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CampaignMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.RoleMapper;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.UserMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
-import de.msg.javatraining.donationmanager.persistence.dtos.mappers.UserMapper;
 import de.msg.javatraining.donationmanager.persistence.factories.IUserServiceFactory;
-import de.msg.javatraining.donationmanager.persistence.model.Campaign;
-import de.msg.javatraining.donationmanager.persistence.model.Permission;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
@@ -27,12 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,12 +75,10 @@ public class UserService {
         userToBeUpdated.setRoles(updateUserDto.getRoles().stream().map(roleMapper::roleDtoToRole).collect(Collectors.toSet()));
         if (userValidator.validate(userToBeUpdated)) {
             User user = factory.getUserRepository().save(userToBeUpdated);
-            if(user != null){
-                eventPublisher.publishEvent(new UpdatedUserEvent(user.toString(),beforeUpdate,user.getUsername()));
-                return new TextResponse("User  updated successfully!");
-            }
+            eventPublisher.publishEvent(new UpdatedUserEvent(user.toString(),beforeUpdate,user.getUsername()));
+            return new TextResponse("User  updated successfully!");
         }
-        return new TextResponse("The user couldn't be updated");
+        throw new InvalidRequestException("Invalid data!");
     }
 
     public TextResponse firstLogin(Long id, FirstLoginDto pd){
@@ -135,11 +131,9 @@ public class UserService {
                 String password = serviceUtils.generateUUID();
                 userToSave.setPassword(passwordEncoder.encode(password));
                 User user = factory.getUserRepository().save(userToSave);
-                if (user != null) {
-                    eventPublisher.publishEvent(new NewUserEvent(user));
-                    serviceUtils.sendSimpleMessage(user, password);
-                    return new TextResponse("User created registered successfully!");
-                }
+                eventPublisher.publishEvent(new NewUserEvent(user));
+                serviceUtils.sendSimpleMessage(user, password);
+                return new TextResponse("User created registered successfully!");
             }else{
                 throw new InvalidRequestException("Invalid data!");
             }

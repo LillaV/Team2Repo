@@ -1,6 +1,5 @@
 package de.msg.javatraining.donationmanager.config.exception;
 
-import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.PropertyValueException;
 import org.hibernate.exception.ConstraintViolationException;
@@ -12,6 +11,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
 import java.sql.SQLIntegrityConstraintViolationException;
 
 @ControllerAdvice

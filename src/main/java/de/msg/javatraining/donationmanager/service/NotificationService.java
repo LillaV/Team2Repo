@@ -54,8 +54,8 @@ public class NotificationService {
         Notification notification = new Notification();
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append("User ");
-        messageBuilder.append(event.getUsername());
-        messageBuilder.append(".\n Previous data:\n");
+        messageBuilder.append(event.getUsername() + " was updated");
+        messageBuilder.append(".\nPrevious data:\n");
         messageBuilder.append(event.getUser());
         messageBuilder.append("\nCurrent data:\n");
         messageBuilder.append(event.getUpdatedUser());

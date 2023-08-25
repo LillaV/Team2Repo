@@ -50,7 +50,7 @@ public class SchedulingConfiguration {
 
 
 
-   /* @Scheduled(fixedRate = 30,timeUnit = TimeUnit.DAYS)
+/*    @Scheduled(fixedRate = 30,timeUnit = TimeUnit.DAYS)
     @Transactional
     public void populateDB (){
         try {

@@ -58,18 +58,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", active=" + active +
-                ", newUser=" + newUser +
-                ", username='" + username + '\'' +
-                ", mobileNumber='" + mobileNumber + '\'' +
-                ", email='" + email + '\'' +
-                ", campaigns=" + campaigns +
-                ", password='" + password + '\'' +
-                ", roles=" + roles.toString()+
-                '}';
+        return "First Name: " + firstName + "\n" +
+                "Last Name: " + lastName + "\n" +
+                "Mobile Number: " + mobileNumber + "\n" +
+                "Email: " + email + "\n" +
+                "Roles:" + roles.toString();
     }
 }

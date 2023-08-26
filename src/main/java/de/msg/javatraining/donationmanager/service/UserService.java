@@ -147,7 +147,9 @@ public class UserService {
     }
 
     public List<UserDto> getAllUsers() {
-        return  this.userRepository.findAll().stream().map(userMapper::userToUserDto).collect(Collectors.toList());
+//        return  this.userRepository.findAll().stream().map(userMapper::userToUserDto).collect(Collectors.toList());
+        List<User> users=userRepository.findAll();
+        return userMapper.usersToUserDtos(users);
     }
 
     public long getSize(){

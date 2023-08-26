@@ -1,11 +1,13 @@
 package de.msg.javatraining.donationmanager.service;
 
+import com.sun.jdi.request.InvalidRequestStateException;
 import de.msg.javatraining.donationmanager.config.exception.RoleNotFoundException;
 import de.msg.javatraining.donationmanager.config.exception.UserNotFoundException;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.PermissionMaper;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.RoleMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.permission.PermissionDTO;
 import de.msg.javatraining.donationmanager.persistence.dtos.permission.RolePermissionsDTO;
+import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.dtos.role.CreateRoleDto;
 import de.msg.javatraining.donationmanager.persistence.model.Permission;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
@@ -40,7 +42,7 @@ public class RoleService {
         return roles.stream().map(ERole -> new CreateRoleDto(ERole,new HashSet<PermissionDTO>())).collect(Collectors.toList());
     }
 
-    public String addPermission(Set<PermissionDTO> permissionDTOS,Long roleId){
+    public TextResponse addPermission(Set<PermissionDTO> permissionDTOS, Long roleId){
         Optional<Role> foundRole = roleRepository.findById(roleId);
         if(foundRole.isPresent()){
              Role role = foundRole.get();
@@ -48,9 +50,9 @@ public class RoleService {
             permissions.addAll(permissionDTOS.stream().map(mapper::permisssionDTOToPermission).collect(Collectors.toSet()));
             role.setPermissions(permissions);
             roleRepository.save(role);
-            return "Added permissions";
+            return new TextResponse("The permissions were added accordingly!");
         }
-        throw new RoleNotFoundException("the role doesn't exist");
+        throw new RoleNotFoundException("The role you are trying to  add the permissions for is missing!");
     }
 
     public List<RolePermissionsDTO> getPermissions(Long userId){
@@ -69,7 +71,7 @@ public class RoleService {
        throw new UserNotFoundException("the user doesn't exist");
     }
 
-    public String removePermissions(Set<PermissionDTO> permissionDTOS,Long roleId){
+    public TextResponse removePermissions(Set<PermissionDTO> permissionDTOS,Long roleId){
         Optional<Role> foundRole = roleRepository.findById(roleId);
         if(foundRole.isPresent()){
             Role role = foundRole.get();
@@ -77,9 +79,9 @@ public class RoleService {
             Set<Permission> resultedPermisssions = permissions.stream().filter(permission -> !isAcquired(permissionDTOS, permission.getId())).collect(Collectors.toSet());
             role.setPermissions(resultedPermisssions);
             roleRepository.save(role);
-            return "Removed permissions";
+            return new TextResponse("All permissions were removed !!");
         }
-        throw new RoleNotFoundException("the role is missing");
+        throw new RoleNotFoundException("The role you are  trying to  remove permissions from  is missing!");
     }
 
     private boolean isAcquired(Set<PermissionDTO> acquired,Long permissionId){

@@ -8,7 +8,6 @@ import de.msg.javatraining.donationmanager.persistence.repository.RefreshTokenRe
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.Optional;
 

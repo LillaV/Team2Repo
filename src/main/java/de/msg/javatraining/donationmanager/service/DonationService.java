@@ -106,6 +106,10 @@ public class DonationService {
         return new DonationFilterPair(donations.stream().collect(Collectors.toList()), size);
     }
 
+    public List<Donation> filterDonations(Specification<Donation> spec){
+        return donationRepository.findAll(spec);
+    }
+
     public List<String> getCurrencies() {
         return donationRepository.getDistinctCurrencies();
     }

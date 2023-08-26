@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SimpleDonatorDto {
+    private Long id;
     private String firstName;
     private String lastName;
     private String additionalName;

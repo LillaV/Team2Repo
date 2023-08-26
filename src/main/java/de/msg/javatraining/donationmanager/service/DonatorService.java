@@ -6,6 +6,8 @@ import de.msg.javatraining.donationmanager.persistence.factories.IDonatorService
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
+import de.msg.javatraining.donationmanager.persistence.repository.DonationRepository;
+import de.msg.javatraining.donationmanager.persistence.repository.DonatorRepository;
 import de.msg.javatraining.donationmanager.service.validation.DonatorValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +25,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class DonatorService {
     @Autowired
-    IDonatorServiceFactory factory;
+    DonationRepository donationRepository;
+
+    @Autowired
+    DonatorRepository donatorRepository;
 
     @Autowired
     DonatorMapper donatorMapper;
@@ -31,29 +36,29 @@ public class DonatorService {
     @Autowired
     DonatorValidator donatorValidator;
     public List<Donator> allDonatorsWithPagination(int offset, int pageSize){
-        Page<Donator> donators =  factory.getDonatorRepository().findAll(PageRequest.of(offset, pageSize));
+        Page<Donator> donators =  donatorRepository.findAll(PageRequest.of(offset, pageSize));
         return donators.stream().collect(Collectors.toList());
     }
 
     public List<Donator> getDonators(){
-        return factory.getDonatorRepository().findAll();
+        return donatorRepository.findAll();
     }
 
     public Donator updateDonator(Long id, SimpleDonatorDto simpleDonatorDto) {
-        Donator updatedDonator = factory.getDonatorRepository().findById(id).get();
+        Donator updatedDonator = donatorRepository.findById(id).get();
         updatedDonator.setFirstName(simpleDonatorDto.getFirstName());
         updatedDonator.setLastName(simpleDonatorDto.getLastName());
         updatedDonator.setAdditionalName(simpleDonatorDto.getAdditionalName());
         updatedDonator.setMaidenName(simpleDonatorDto.getMaidenName());
-        factory.getDonatorRepository().save(updatedDonator);
+        donatorRepository.save(updatedDonator);
         return updatedDonator;
     }
 
     public void deleteDonatorById(Long id) {
-        if(factory.getDonationRepository().existsByBenefactorId(id)){
+        if(donationRepository.existsByBenefactorId(id)){
             setToUnknown(id);
         } else {
-            factory.getDonatorRepository().deleteById(id);
+            donatorRepository.deleteById(id);
         }
     }
 
@@ -61,10 +66,10 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
     Donator donator = donatorMapper.SimpleDonatorDtoToDonator(simpleDonatorDto);
 
     // Check if the donator already exists based on first name, last name, additional name, and maiden name
-    if (!factory.getDonatorRepository().existsByFirstNameAndLastNameAndAdditionalNameAndMaidenName(
+    if (!donatorRepository.existsByFirstNameAndLastNameAndAdditionalNameAndMaidenName(
             donator.getFirstName(), donator.getLastName(), donator.getAdditionalName(), donator.getMaidenName())) {
         if (donatorValidator.validate(donator)) {
-            factory.getDonatorRepository().save(donator);
+            donatorRepository.save(donator);
         } else {
             System.out.println("Cannot save");
         }
@@ -73,17 +78,18 @@ public void saveDonator(SimpleDonatorDto simpleDonatorDto) {
     }
 }
 
-    public Donator findById(Long id) {
-        return factory.getDonatorRepository().findById(id).get();
+    public SimpleDonatorDto findById(Long id) {
+        Donator donatorToFind=donatorRepository.findById(id).get();
+        return donatorMapper.donatorToSimpleDonatorDto(donatorToFind);
     }
 
 
 
     public void setToUnknown(Long id){
-        updateDonator(id, new SimpleDonatorDto("Unknown", "Unknown", "Unknown", "Unknown"));
+        updateDonator(id, new SimpleDonatorDto(id,"Unknown", "Unknown", "Unknown", "Unknown"));
     }
 
     public long getSize(){
-        return factory.getDonatorRepository().count();
+        return donatorRepository.count();
     }
 }

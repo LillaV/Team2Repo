@@ -42,7 +42,7 @@ public class DonatorController {
     }
 
     @GetMapping("/{id}")
-    public Donator getDonatorById(@PathVariable(name = "id") Long id){
+    public SimpleDonatorDto getDonatorById(@PathVariable(name = "id") Long id){
         return  donatorService.findById(id);
     }
 

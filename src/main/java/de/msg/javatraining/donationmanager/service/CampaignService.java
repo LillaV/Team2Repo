@@ -2,10 +2,10 @@ package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CampaignMapper;
-import de.msg.javatraining.donationmanager.persistence.factories.IDonationServiceFactory;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.CampaignFilterPair;
 import de.msg.javatraining.donationmanager.persistence.repository.CampaignRepository;
+import de.msg.javatraining.donationmanager.persistence.repository.DonationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +24,7 @@ public class CampaignService{
     private CampaignRepository campaignRepository;
 
     @Autowired
-    IDonationServiceFactory factory;
+    DonationRepository donationRepository;
 
     @Autowired
     private CampaignMapper campaignMapper;
@@ -32,11 +32,11 @@ public class CampaignService{
     public List<CampaignDto> allCampaignsWithPagination(int offset, int pageSize){
         Page<Campaign> campaigns = campaignRepository.findAll(PageRequest.of(offset, pageSize));
         return campaigns.stream().map(campaign -> campaignMapper.campaignToCampaignDto(campaign)).collect(Collectors.toList());
-    }
+    }//intrebat
 
     public List<CampaignDto> getCampaigns(){
         List<Campaign> campaigns=campaignRepository.findAll();
-        return campaigns.stream().map(campaign -> campaignMapper.campaignToCampaignDto(campaign)).collect(Collectors.toList());
+        return campaignMapper.campaignsToCampaignDtos(campaigns);
     }
 
     public void saveCampaign(CampaignDto campaignDto){
@@ -58,7 +58,7 @@ public class CampaignService{
 
     public void deleteCampaignById(Long id){
         Campaign campaignToFind=campaignRepository.findById(id).get();
-        if(factory.getDonationRepository().existsByCampaignAndApprovedTrue(campaignToFind)){
+        if(donationRepository.existsByCampaignAndApprovedTrue(campaignToFind)){
             throw new RuntimeException("Not allowed to delete");
         }else {
             campaignRepository.deleteById(id);
@@ -70,7 +70,7 @@ public class CampaignService{
         Page<Campaign> campaigns = campaignRepository.findAll(spec, pageable);
 
         return  new CampaignFilterPair(campaigns.stream().collect(Collectors.toList()), size);
-    }
+    }//has no tests
 
     public long getSize() {
         return campaignRepository.count();

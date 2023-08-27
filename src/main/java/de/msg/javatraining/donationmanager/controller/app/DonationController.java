@@ -45,25 +45,25 @@ public class DonationController {
 
 
     @GetMapping("/currencies")
-    @PreAuthorize("hasAuthority(DONATION_MANAGEMENT) or hasAuthority(DONATION_REPORTING)")
+    @PreAuthorize("hasAuthority('DONATION_MANAGEMENT') or hasAuthority('DONATION_REPORTING')")
     public List<String> getCurrencies() {
         return donationService.getCurrencies();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority(DONATION_MANAGEMENT)")
+    @PreAuthorize("hasAuthority('DONATION_MANAGEMENT')")
     public SimpleDonationDto findDonationById(@PathVariable(name = "id") Long id) {
         return donationMapper.donationToSimpleDonationDto(donationService.findById(id));
     }
 
     @GetMapping("/size")
-    @PreAuthorize("hasAuthority(BENEF_MANAGEMENT)")
+    @PreAuthorize("hasAuthority('BENEF_MANAGEMENT')")
     public long getSize() {
         return donationService.getSize();
     }
 
     @PostMapping()
-    @PreAuthorize("hasAuthority(BENEF_MANAGEMENT)")
+    @PreAuthorize("hasAuthority('BENEF_MANAGEMENT')")
     public TextResponse saveDonation(@RequestBody SimpleDonationDto donationDto) {
         try {
             donationService.saveDonation(donationDto);
@@ -74,7 +74,7 @@ public class DonationController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority(DONATION_APPROVE )")
+    @PreAuthorize("hasAuthority('DONATION_APPROVE' )")
     public TextResponse updateDonation(@RequestBody() UpdateDonationDto updateDonationDto, @PathVariable("id") Long id) {
         Donation donation = donationService.findById(id);
         if (!donation.getApproved()) {
@@ -89,7 +89,7 @@ public class DonationController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority(DONATION_MANAGEMENT )")
+    @PreAuthorize("hasAuthority('DONATION_MANAGEMENT' )")
     public TextResponse deleteDonation(@PathVariable("id") Long id) {
         Donation donationDto = donationService.findById(id);
         if (!donationDto.getApproved()) {
@@ -101,7 +101,7 @@ public class DonationController {
     }
 
     @PutMapping("/approve")
-    @PreAuthorize("hasAuthority(DONATION_APPROVE)")
+    @PreAuthorize("hasAuthority('DONATION_APPROVE')")
     public TextResponse approveDonation(@RequestParam(name = "donationId") Long donationId, @RequestParam(name = "approvedById") Long approvedById) {
         Donation donation = donationService.findById(donationId);
         Optional<User> approvedBy = userRepository.findById(approvedById);
@@ -114,7 +114,7 @@ public class DonationController {
     }
 
     @GetMapping("/filter")
-    @PreAuthorize("hasAuthority(BENEF_MANAGEMENT)")
+    @PreAuthorize("hasAuthority('BENEF_MANAGEMENT')")
     public DonationFilterPair filterDonations(@RequestParam(name = "offset") Integer offset, @RequestParam(name = "pageSize") Integer pageSize, @RequestParam(name = "minAmount", required = false) Float minValue, @RequestParam(name = "maxAmount", required = false) Float maxValue, @RequestParam(name = "value", required = false) Float value, @RequestParam(name = "currency", required = false) String currency, @RequestParam(name = "campaignId", required = false) Long campaignId, @RequestParam(name = "searchTerm", required = false) String searchTerm, @RequestParam(name = "createdById", required = false) Long createdById, @RequestParam(name = "createDateStart", required = false) LocalDate startDate, @RequestParam(name = "createDateEnd", required = false) LocalDate endDate, @RequestParam(name = "benefactorId", required = false) Long benefactorId, @RequestParam(name = "approved", required = false) Boolean approved, @RequestParam(name = "approvedById", required = false) Long approvedById, @RequestParam(name = "approvedDateStart", required = false) LocalDate approvedDateStart, @RequestParam(name = "approvedDateEnd", required = false) LocalDate approvedDateEnd) {
         Specification<Donation> spec = donationSpecifications.filterDonations(minValue, maxValue, value, currency, campaignId, searchTerm, createdById, startDate, endDate, benefactorId, approved, approvedById, approvedDateStart, approvedDateEnd);
         return donationService.filterDonationsWithPaging(spec, PageRequest.of(offset, pageSize));

@@ -20,24 +20,25 @@ public class RoleController {
     private RoleService roleService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('PERMISSION_MANAGEMENT')")
     public List<RoleDto> findAll() {
         return roleService.findAll();
     }
 
     @PutMapping("add/{id}")
-    @PreAuthorize("hasAuthority(PERMISSION_MANAGEMENT)")
+    @PreAuthorize("hasAuthority('PERMISSION_MANAGEMENT')")
     public TextResponse accordPermissions(@PathVariable("id") Long roleId, @RequestBody Set<PermissionDTO> permissionDTOS) {
         return this.roleService.addPermission(permissionDTOS, roleId);
     }
 
     @GetMapping("/permissions")
-    @PreAuthorize("hasAuthority(PERMISSION_MANAGEMENT)")
+    @PreAuthorize("hasAuthority('PERMISSION_MANAGEMENT')")
     public List<RolePermissionsDTO> getPermissions() {
         return this.roleService.getPermissions();
     }
 
     @PutMapping("remove/{id}")
-    @PreAuthorize("hasAuthority(PERMISSION_MANAGEMENT)")
+    @PreAuthorize("hasAuthority('PERMISSION_MANAGEMENT')")
     public TextResponse removePermissions(@PathVariable("id") Long roleId, @RequestBody Set<PermissionDTO> permissionDTOS) {
         return this.roleService.removePermissions(permissionDTOS, roleId);
     }

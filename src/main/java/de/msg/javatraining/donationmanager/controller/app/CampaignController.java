@@ -34,7 +34,7 @@ public class CampaignController {
     private CampaignSpecifications campaignSpecifications;
 
     @GetMapping
-    @PreAuthorize("hasAuthority(CAMP_MANAGEMENT ) or hasAuthority(CAMP_REPORTING) or hasAuthority(CAMP_REPORT_RESTRICTED )")
+    @PreAuthorize("hasAuthority('CAMP_MANAGEMENT' ) or hasAuthority('CAMP_REPORTING') or hasAuthority('CAMP_REPORT_RESTRICTED' )")
     public List<CampaignDto> getCampaigns(@RequestParam(name = "offset", required = false) Integer offset, @RequestParam(name = "pageSize", required = false) Integer pageSize) {
         if (offset != null && pageSize != null) {
             return campaignService.allCampaignsWithPagination(offset, pageSize);
@@ -44,13 +44,13 @@ public class CampaignController {
     }
 
     @GetMapping("/size")
-    @PreAuthorize("hasAuthority(CAMP_MANAGEMENT) or hasAuthority(CAMP_REPORTING or hasAuthority(CAMP_REPORT_RESTRICTED ))")
+    @PreAuthorize("hasAuthority('CAMP_MANAGEMENT') or hasAuthority('CAMP_REPORTING' or hasAuthority('CAMP_REPORT_RESTRICTED' ))")
     public long getSize() {
         return campaignService.getSize();
     }
 
     @PostMapping()
-    @PreAuthorize("hasAuthority(CAMP_MANAGEMENT)")
+    @PreAuthorize("hasAuthority('CAMP_MANAGEMENT')")
     public ResponseEntity<String> saveCampaign(@RequestBody CampaignDto campaignDto) {
         try {
             campaignService.saveCampaign(campaignDto);
@@ -62,7 +62,7 @@ public class CampaignController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority(CAMP_MANAGEMENT)")
+    @PreAuthorize("hasAuthority('CAMP_MANAGEMENT')")
     public ResponseEntity updateCampaign(@PathVariable("id") Long id, @RequestBody() CampaignDto campaign) {
         try {
             campaignService.updateCampaign(id, campaign);
@@ -73,13 +73,13 @@ public class CampaignController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority(CAMP_MANAGEMENT )")
+    @PreAuthorize("hasAuthority('CAMP_MANAGEMENT' )")
     public CampaignDto findCampaignById(@PathVariable(name = "id") Long id) {
         return campaignService.findById(id);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority(CAMP_MANAGEMENT )")
+    @PreAuthorize("hasAuthority('CAMP_MANAGEMENT' )")
     public ResponseEntity deleteCampaignById(@PathVariable(name = "id") Long id) {
         try {
             campaignService.deleteCampaignById(id);
@@ -90,7 +90,7 @@ public class CampaignController {
     }
 
     @GetMapping("/filter")
-    @PreAuthorize("hasAuthority(CAMP_MANAGEMENT )")
+    @PreAuthorize("hasAuthority('CAMP_MANAGEMENT' )")
     public CampaignFilterPair filterCampaigns(@RequestParam(name = "offset", required = false) int offset, @RequestParam(name = "pageSize", required = false) int pageSize, @RequestParam(name = "nameTerm", required = false) String nameTerm, @RequestParam(name = "purposeTerm", required = false) String purposeTerm) {
         Specification<Campaign> spec = campaignSpecifications.filterCampaigns(nameTerm, purposeTerm);
 
@@ -98,7 +98,7 @@ public class CampaignController {
     }
 
     @GetMapping("/search/{text}")
-    @PreAuthorize("hasAuthority(CAMP_MANAGEMENT )")
+    @PreAuthorize("hasAuthority('CAMP_MANAGEMENT' )")
     public  List<CampaignDto> sercahCampaigns(@PathVariable(name = "text") String text){
         return this.campaignService.searchForCampaigns(text);
     }

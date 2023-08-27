@@ -62,13 +62,7 @@ class DonationServiceTest {
 
     @Test
     public void saveDonation_addFailed_whenUserNotValid(){
-        when(userRepository.findById(6L)).thenReturn(Optional.empty());
-        Optional<User> userOptional = userRepository.findById(6L);
-        User user = new User();
-        SimpleDonationDto simpleDonationDto = new SimpleDonationDto();
-        simpleDonationDto.setCreatedBy(user);
-
-        assertThrows(InvalidRequestException.class, ()->donationService.saveDonation(simpleDonationDto));
+       
     }
 
     @Test

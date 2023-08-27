@@ -2,6 +2,7 @@ package de.msg.javatraining.donationmanager.config.security;
 
 
 import de.msg.javatraining.donationmanager.service.security.UserDetailsServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +46,7 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
+      http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers("/auth/**", "/app/test/**","/api/**").permitAll() //these requests are allowed
                         .anyRequest().authenticated()) //any other request must be authenticated
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS)) // we don't want sessions
@@ -54,7 +55,7 @@ public class WebSecurityConfig {
                 .cors(cors -> {
                     cors.configurationSource(request -> {
                         CorsConfiguration corsConfiguration = new CorsConfiguration();
-                        corsConfiguration.addAllowedOrigin("http://localhost:4200"); // Replace with your frontend origin
+                        corsConfiguration.addAllowedOrigin("http://localhost:4200");
                         corsConfiguration.addAllowedHeader("*");
                         corsConfiguration.addAllowedMethod("*");
                         corsConfiguration.setAllowCredentials(true);

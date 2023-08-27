@@ -3,6 +3,7 @@ package de.msg.javatraining.donationmanager.controller.app;
 import com.opencsv.CSVWriter;
 import com.sun.mail.iap.ByteArray;
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.CampaignFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
@@ -52,39 +53,36 @@ public class CampaignController {
 
     @PostMapping()
     public ResponseEntity<String> saveCampaign(@RequestBody CampaignDto campaignDto) {
-        try{
+        try {
             campaignService.saveCampaign(campaignDto);
             return new ResponseEntity<>("Campaign saved", HttpStatus.OK);
-        }
-        catch (Exception exception){
+        } catch (Exception exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity updateCampaign(@PathVariable("id") Long id,@RequestBody() CampaignDto campaign) {
-        try{
+    public ResponseEntity updateCampaign(@PathVariable("id") Long id, @RequestBody() CampaignDto campaign) {
+        try {
             campaignService.updateCampaign(id, campaign);
             return new ResponseEntity<>("Campaign saved", HttpStatus.OK);
-        }
-        catch (Exception exception){
+        } catch (Exception exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
     }
 
     @GetMapping("/{id}")
-    public CampaignDto findCampaignById(@PathVariable(name = "id") Long id){
+    public CampaignDto findCampaignById(@PathVariable(name = "id") Long id) {
         return campaignService.findById(id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteCampaignById(@PathVariable(name = "id") Long id){
-        try{
+    public ResponseEntity deleteCampaignById(@PathVariable(name = "id") Long id) {
+        try {
             campaignService.deleteCampaignById(id);
             return new ResponseEntity<>("Campaign deleted", HttpStatus.OK);
-        }
-        catch (Exception exception){
+        } catch (Exception exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
     }

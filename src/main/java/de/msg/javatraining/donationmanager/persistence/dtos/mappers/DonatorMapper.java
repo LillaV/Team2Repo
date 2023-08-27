@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 
 @Mapper
 public interface DonatorMapper {
-    SimpleDonatorDto donatorToSimpleDonatorDto(Donator donator);
 
     Donator SimpleDonatorDtoToDonator(SimpleDonatorDto simpleDonatorDto);
+    SimpleDonatorDto donatorToSimpleDonatorDto(Donator donator);
 }

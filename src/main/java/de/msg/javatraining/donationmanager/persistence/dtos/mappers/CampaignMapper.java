@@ -6,7 +6,6 @@ import org.mapstruct.Mapper;
 
 @Mapper
 public interface CampaignMapper {
-
     Campaign campaignDtoToCampaign(CampaignDto campaignDto);
 
     CampaignDto campaignToCampaignDto(Campaign campaign);

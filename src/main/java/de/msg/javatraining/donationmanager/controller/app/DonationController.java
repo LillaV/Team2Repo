@@ -1,11 +1,13 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
 import com.opencsv.CSVWriter;
+import de.msg.javatraining.donationmanager.config.exception.InvalidRequestException;
+import de.msg.javatraining.donationmanager.persistence.dtos.donation.DonationFilterPair;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonationDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonationMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
-import de.msg.javatraining.donationmanager.persistence.model.DonationFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
 import de.msg.javatraining.donationmanager.service.DonationService;
@@ -15,7 +17,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +39,8 @@ public class DonationController {
     private DonationSpecifications donationSpecifications;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private DonationMapper donationMapper;
 
 
     @GetMapping("/currencies")
@@ -46,8 +49,8 @@ public class DonationController {
     }
 
     @GetMapping("/{id}")
-    public Donation findDonationById(@PathVariable(name = "id") Long id) {
-        return donationService.findById(id);
+    public SimpleDonationDto findDonationById(@PathVariable(name = "id") Long id) {
+        return donationMapper.donationToSimpleDonationDto(donationService.findById(id));
     }
 
     @GetMapping("/size")
@@ -68,35 +71,37 @@ public class DonationController {
     @PutMapping("/{id}")
     public TextResponse updateDonation(@RequestBody() UpdateDonationDto updateDonationDto, @PathVariable("id") Long id) {
         Donation donation = donationService.findById(id);
-        if (!donation.isApproved()) {
-            donationService.updateDonation(id, updateDonationDto);
-            return new TextResponse("Donation updated");
-        } else {
-            return new TextResponse("Donation is already approved, you cannot edit it anymore.");
+        if (!donation.getApproved()) {
+            if (!donation.getApproved()) {
+                donationService.updateDonation(id, updateDonationDto);
+                return new TextResponse("Donation updated");
+            } else {
+                return new TextResponse("Donation is already approved, you cannot edit it anymore.");
+            }
         }
+        throw new InvalidRequestException("The donation you are trying to modify can't be updated");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDonation(@PathVariable("id") Long id) {
+    public TextResponse deleteDonation(@PathVariable("id") Long id) {
         Donation donationDto = donationService.findById(id);
-        if (!donationDto.isApproved()) {
+        if (!donationDto.getApproved()) {
             donationService.deleteDonation(id);
-            return new ResponseEntity<>("Donation deleted successfully", HttpStatus.OK);
+            return new TextResponse("Donation updated successfully!");
         } else {
-            return new ResponseEntity<>("Donation is already approved, you cannot delete it anymore.", HttpStatus.FORBIDDEN);
+            return new TextResponse("Donation is already approved, you cannot delete it anymore.");
         }
     }
 
     @PutMapping("/approve")
-    public ResponseEntity approveDonation(@RequestParam(name = "donationId") Long donationId,
-                                          @RequestParam(name = "approvedById") Long approvedById) {
+    public TextResponse approveDonation(@RequestParam(name = "donationId") Long donationId, @RequestParam(name = "approvedById") Long approvedById) {
         Donation donation = donationService.findById(donationId);
         Optional<User> approvedBy = userRepository.findById(approvedById);
         if (donation.getCreatedBy().getId() != approvedById && approvedBy.isPresent()) {
             donationService.approveDonation(donation, approvedBy.get());
-            return new ResponseEntity<>("Donation approved successfully", HttpStatus.OK);
+            return new TextResponse("Donation approved successfully");
         } else {
-            return new ResponseEntity<>("4 Augen Prinzip is violated", HttpStatus.BAD_REQUEST);
+            return new TextResponse("You cannot  approve your own donation!");
         }
     }
 

@@ -9,6 +9,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.response.TextRespons
 import de.msg.javatraining.donationmanager.persistence.dtos.role.RoleDto;
 import de.msg.javatraining.donationmanager.persistence.model.Permission;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
+import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.repository.PermissionRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,10 @@ public class RoleService {
     RoleMapper roleMapper;
 
     public List<RoleDto> findAll() {
-        return roleRepository.findAll().stream().map(roleMapper::roleToRoleDto).collect(Collectors.toList());
+        //return roleRepository.findAll().stream().map(roleMapper::roleToRoleDto).collect(Collectors.toList());
+        List<Role> roles=roleRepository.findAll();
+        return roleMapper.rolesToRoleDtos(roles);
+
     }
 
     public TextResponse addPermission(Set<PermissionDTO> permissionDTOS, Long roleId) {

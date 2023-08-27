@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class DonatorService {
+    @Autowired
+    DonationRepository donationRepository;
 
     @Autowired
     DonatorRepository donatorRepository;
@@ -29,17 +31,14 @@ public class DonatorService {
 
     @Autowired
     DonatorValidator donatorValidator;
-
-    @Autowired
-    DonationRepository donationRepository;
-
-    public List<SimpleDonatorDto> allDonatorsWithPagination(int offset, int pageSize) {
-        Page<Donator> donators = donatorRepository.findAll(PageRequest.of(offset, pageSize));
-        return donators.stream().map(donatorMapper::donatorToSimpleDonatorDto).collect(Collectors.toList());
+    public List<SimpleDonatorDto> allDonatorsWithPagination(int offset, int pageSize){
+        Page<Donator> donators =  donatorRepository.findAll(PageRequest.of(offset, pageSize));
+        return donators.stream().map(donator -> donatorMapper.donatorToSimpleDonatorDto(donator)).collect(Collectors.toList());
     }
 
-    public List<SimpleDonatorDto> getDonators() {
-        return donatorRepository.findAll().stream().map(donatorMapper::donatorToSimpleDonatorDto).collect(Collectors.toList());
+    public List<SimpleDonatorDto> getDonators(){
+        List<Donator> donators=donatorRepository.findAll();
+        return donatorMapper.donatorsToSimpleDonatorDtos(donators);
     }
 
     public TextResponse updateDonator(Long id, SimpleDonatorDto simpleDonatorDto) {
@@ -82,7 +81,7 @@ public class DonatorService {
         throw new InvalidRequestException("Donator doesn't exists!");
     }
 
-    public Long getSize() {
+    public long getSize(){
         return donatorRepository.count();
     }
 }

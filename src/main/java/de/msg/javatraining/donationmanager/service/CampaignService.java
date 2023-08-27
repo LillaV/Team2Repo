@@ -67,7 +67,7 @@ public class CampaignService {
             return campaignRepository.getCustomCampaignList(user1.getId()).stream().map(campaignMapper::campaignToCampaignDto).collect(Collectors.toList());
         }
         List<Campaign> campaigns = campaignRepository.findAll();
-        return campaigns.stream().map(campaign -> campaignMapper.campaignToCampaignDto(campaign)).collect(Collectors.toList());
+        return campaignMapper.campaignsToCampaignDtos(campaigns);
     }
 
     public TextResponse saveCampaign(CampaignDto campaignDto) {

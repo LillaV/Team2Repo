@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserService {
     @Autowired
+    CreateUserMapper createUserMapper;
+    @Autowired
     UserMapper userMapper;
     @Autowired
     RoleMapper roleMapper;
@@ -126,7 +128,7 @@ public class UserService {
 
     public TextResponse saveUser(CreateUserDto userDto) {
         if (userDto.getRoles().size() > 0) {
-            User userToSave = CreateUserMapper.createUserDtoToUser(userDto);
+            User userToSave = createUserMapper.createUserDtoToUser(userDto);
             userValidator.validate(userToSave);
             userToSave.setUsername(serviceUtils.generateUsername(userToSave, userRepository.findAll()));
             String password = serviceUtils.generateUUID();

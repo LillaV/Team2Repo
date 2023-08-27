@@ -1,17 +1,29 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
+import com.opencsv.CSVWriter;
+import com.sun.mail.iap.ByteArray;
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.CampaignFilterPair;
+import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.service.CampaignService;
 import de.msg.javatraining.donationmanager.service.filter.CampaignSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/campaigns")
@@ -89,5 +101,75 @@ public class CampaignController {
         );
 
         return campaignService.filterCampaignsWithPaging(spec, PageRequest.of(offset, pageSize));
+    }
+
+    @GetMapping("/export-csv")
+    public ResponseEntity<ByteArrayResource> exportCsv(
+            @RequestParam(name = "nameTerm", required = false) String nameTerm,
+            @RequestParam(name = "purposeTerm", required = false) String purposeTerm
+    ){
+        Specification<Campaign> spec = campaignSpecifications.filterCampaigns(
+                nameTerm, purposeTerm
+        );
+
+        List<Campaign> campaigns = campaignService.filterCampaigns(spec);
+
+        byte[] csvData = generateCsvData(campaigns);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "Campaigns.csv");
+
+        ByteArrayResource resource = new ByteArrayResource(csvData);
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(resource);
+    }
+
+    private byte[] generateCsvData(List<Campaign> campaigns)  {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(outputStream))) {
+            String[] header = {
+                    "Name", "Purpose", "Donators"
+            };
+            csvWriter.writeNext(header);
+
+            List<String[]> rows = new ArrayList<>();
+            for (Campaign campaign: campaigns){
+                    String donatorsInfo = campaignService.getDistinctBenefactorsByCampaignId(campaign.getId()).stream()
+                            .map(donator -> {
+                                if (donator != null) {
+                                    StringBuilder donatorInfoBuilder = new StringBuilder(donator.getFirstName());
+                                    if (donator.getAdditionalName() != null) {
+                                        donatorInfoBuilder.append(" ").append(donator.getAdditionalName());
+                                    }
+                                    if (donator.getMaidenName() != null) {
+                                        donatorInfoBuilder.append(" (Maiden: ").append(donator.getMaidenName()).append(")");
+                                    }
+                                    donatorInfoBuilder.append(" ").append(donator.getLastName());
+                                    return donatorInfoBuilder.toString();
+                                }
+                                return "";
+                            })
+                            .collect(Collectors.joining(", "));
+
+                String[] row = {
+                        campaign.getName(),
+                        campaign.getPurpose(),
+                        donatorsInfo
+                };
+
+                rows.add(row);
+            }
+
+            csvWriter.writeAll(rows);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return outputStream.toByteArray();
     }
 }

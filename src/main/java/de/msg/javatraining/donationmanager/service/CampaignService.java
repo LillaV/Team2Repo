@@ -4,6 +4,8 @@ import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CampaignMapper;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.CampaignFilterPair;
+import de.msg.javatraining.donationmanager.persistence.model.Donation;
+import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.persistence.repository.CampaignRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.DonationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +74,15 @@ public class CampaignService{
         return  new CampaignFilterPair(campaigns.stream().collect(Collectors.toList()), size);
     }
 
+    public List<Campaign> filterCampaigns(Specification<Campaign> spec){
+        return campaignRepository.findAll(spec);
+    }
+
     public long getSize() {
         return campaignRepository.count();
+    }
+
+    public List<Donator> getDistinctBenefactorsByCampaignId(Long campaignId) {
+        return donationRepository.findDistinctBenefactorsByCampaignId(campaignId);
     }
 }

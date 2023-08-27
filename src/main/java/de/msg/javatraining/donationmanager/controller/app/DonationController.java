@@ -162,7 +162,7 @@ public class DonationController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", "filteredDonations.csv");
+        headers.setContentDispositionFormData("attachment", "Donations.csv");
 
         ByteArrayResource resource = new ByteArrayResource(csvData);
 
@@ -182,7 +182,6 @@ public class DonationController {
             };
             csvWriter.writeNext(header);
 
-            // Iterate over your data and add rows
             List<String[]> rows = new ArrayList<>();
             for (Donation donation : filteredDonations) {
                 String creatorFullName = donation.getCreatedBy().getFirstName() + " " + donation.getCreatedBy().getLastName();
@@ -214,7 +213,7 @@ public class DonationController {
 
             csvWriter.writeAll(rows);
         } catch (IOException e) {
-            // Handle exception
+            System.out.println(e.getMessage());
         }
 
         return outputStream.toByteArray();

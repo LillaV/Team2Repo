@@ -3,10 +3,6 @@ package de.msg.javatraining.donationmanager.persistence.dtos.donation;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.persistence.model.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,9 +16,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class SimpleDonationDto {
     private String currency;
-    private float amount;
+    private Float amount;
     private LocalDate createDate;
-    private boolean approved;
+    private Boolean approved;
     private LocalDate approvedDate;
     private String notes;
     private User createdBy;

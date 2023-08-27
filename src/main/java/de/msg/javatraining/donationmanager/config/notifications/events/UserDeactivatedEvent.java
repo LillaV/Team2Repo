@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class UserDeactivatedEvent extends BaseEvent{
-    User user;
+    private User user;
     public UserDeactivatedEvent(User user){
         super(EventType.USER_DEACTIVATED);
         this.user = user;

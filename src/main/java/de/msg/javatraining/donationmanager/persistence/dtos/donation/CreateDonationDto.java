@@ -14,8 +14,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CreateDonationDto {
     private String currency;
-    private float amount;
-    private boolean approved;
+    private Float amount;
+    private Boolean approved;
     private String notes;
     private User createdBy;
     private Campaign campaign;

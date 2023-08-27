@@ -1,7 +1,6 @@
 package de.msg.javatraining.donationmanager.persistence.dtos.permission;
 
 
-
 import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

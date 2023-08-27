@@ -7,9 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Transactional
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken,String> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
     @Modifying
     @Query("delete from RefreshToken where user.id = :id")
-    void deleteRefreshTokenByUser( @Param("id")Long id);
+    void deleteRefreshTokenByUser(@Param("id") Long id);
+
+    Optional<RefreshToken> findRefreshTokenByRefreshToken(String refreshToken);
 }

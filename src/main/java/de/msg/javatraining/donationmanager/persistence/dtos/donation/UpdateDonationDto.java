@@ -13,9 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UpdateDonationDto {
     private String currency;
-    private float amount;
+    private Float amount;
     private String notes;
     private Campaign campaign;
     private Donator benefactor;
-    private boolean approved;
+    private Boolean approved;
 }

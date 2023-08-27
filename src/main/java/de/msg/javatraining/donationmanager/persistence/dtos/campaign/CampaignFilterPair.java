@@ -1,10 +1,10 @@
-package de.msg.javatraining.donationmanager.persistence.model;
+package de.msg.javatraining.donationmanager.persistence.dtos.campaign;
 
+import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.List;
 
 @AllArgsConstructor

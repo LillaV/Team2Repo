@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDate;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -21,10 +20,10 @@ public class Donation {
     @Column(nullable = false)
     private String currency;
     @Column(nullable = false)
-    private float amount;
+    private Float amount;
     @Column(nullable = false)
     private LocalDate createDate;
-    private boolean approved;
+    private Boolean approved;
     private LocalDate approvedDate;
     private String notes;
     @ManyToOne
@@ -34,7 +33,7 @@ public class Donation {
     @JoinColumn(name = "auser_id")
     private User approvedBy;
     @ManyToOne
-    @JoinColumn(name="campaign_id", nullable=false)
+    @JoinColumn(name = "campaign_id", nullable = false)
     private Campaign campaign;
     @ManyToOne
     @JoinColumn(name = "donator_id")

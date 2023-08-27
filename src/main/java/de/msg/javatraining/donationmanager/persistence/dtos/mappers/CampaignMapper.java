@@ -8,7 +8,6 @@ import java.util.List;
 
 @Mapper
 public interface CampaignMapper {
-
     Campaign campaignDtoToCampaign(CampaignDto campaignDto);
 
     CampaignDto campaignToCampaignDto(Campaign campaign);

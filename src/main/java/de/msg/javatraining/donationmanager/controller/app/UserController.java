@@ -2,14 +2,14 @@ package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
+import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
-import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
-import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController

@@ -1,7 +1,6 @@
 package de.msg.javatraining.donationmanager.persistence.dtos.mappers;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.donation.SimpleDonationDto;
-import de.msg.javatraining.donationmanager.persistence.dtos.donation.UpdateDonationDto;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import org.mapstruct.Mapper;
 
@@ -11,5 +10,4 @@ public interface DonationMapper {
 
     Donation simpleDonationDtoToDonation(SimpleDonationDto simpleDonationDto);
 
-    UpdateDonationDto donationToUpdateDonationDto(Donation donation);
 }

@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.Instant;
 
 @Getter
@@ -15,13 +14,11 @@ import java.time.Instant;
 @Entity
 @Table(name = "refreshToken")
 public class RefreshToken {
-    @Id
-    private String refreshToken;
-
     @OneToOne
     @JoinColumn(name = "user_id")
     User user;
-
+    @Id
+    private String refreshToken;
     @Column(nullable = false)
     private Instant expiryDate;
 

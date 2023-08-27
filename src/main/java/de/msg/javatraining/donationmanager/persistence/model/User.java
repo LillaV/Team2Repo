@@ -1,7 +1,11 @@
 package de.msg.javatraining.donationmanager.persistence.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,12 +39,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "campaign_id"))
     private Set<Campaign> campaigns = new HashSet<>();
     private String password;
-    @ManyToMany(fetch = FetchType.EAGER , cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-    private Integer failedLoginAttempts=0;
+    private Integer failedLoginAttempts = 0;
 
     public User(String firstName, String lastName, boolean active, boolean newUser, String username, String mobileNumber, String email, Set<Campaign> campaigns, String password, Set<Role> roles, Integer failedLoginAttempts) {
         this.firstName = firstName;

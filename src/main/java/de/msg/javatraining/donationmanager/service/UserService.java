@@ -1,7 +1,6 @@
 package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.config.exception.InvalidRequestException;
-import de.msg.javatraining.donationmanager.config.exception.UserNotFoundException;
 import de.msg.javatraining.donationmanager.config.notifications.events.DeletedUserEvent;
 import de.msg.javatraining.donationmanager.config.notifications.events.NewUserEvent;
 import de.msg.javatraining.donationmanager.config.notifications.events.UpdatedUserEvent;
@@ -15,12 +14,11 @@ import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
-import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
-import de.msg.javatraining.donationmanager.service.utils.UserServiceUtils;
+import de.msg.javatraining.donationmanager.service.utils.UserServiceHelper;
 import de.msg.javatraining.donationmanager.service.validation.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -30,7 +28,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,7 +42,7 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
-    UserServiceUtils serviceUtils;
+    UserServiceHelper serviceUtils;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -53,9 +50,9 @@ public class UserService {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
     @Autowired
-    CreateUserMapper createUserMapper;
+    private CampaignMapper campaignMapper;
     @Autowired
-    CampaignMapper campaignMapper;
+    MailService mailService;
 
     public List<UserDto> allUsersWithPagination(int offset, int pageSize) {
         Page<User> users = userRepository.findAll(PageRequest.of(offset, pageSize));
@@ -65,32 +62,30 @@ public class UserService {
 
     public TextResponse updateUser(Long id, UpdateUserDto updateUserDto) {
         Optional<User> updatedUser = userRepository.findById(id);
-        if(!updatedUser.isPresent()){
+        if (!updatedUser.isPresent()) {
             throw new UsernameNotFoundException("The user you are trying to  update doesn't exists!");
         }
         if (updateUserDto.getRoles().size() == 0) {
             throw new InvalidRequestException("You cannot remove all the roles from an user!");
         }
-        User userToBeUpdated =  updatedUser.get();
+        User userToBeUpdated = updatedUser.get();
         String beforeUpdate = userToBeUpdated.toString();
         userToBeUpdated.setFirstName(updateUserDto.getFirstName());
         userToBeUpdated.setLastName(updateUserDto.getLastName());
-        userToBeUpdated.setActive(updateUserDto.isActive());
-        userToBeUpdated.setNewUser(updateUserDto.isNewUser());
+        userToBeUpdated.setActive(updateUserDto.getActive());
+        userToBeUpdated.setNewUser(updateUserDto.getNewUser());
         userToBeUpdated.setEmail(updateUserDto.getEmail());
         userToBeUpdated.setMobileNumber(updateUserDto.getMobileNumber());
         userToBeUpdated.setRoles(updateUserDto.getRoles().stream().map(roleMapper::roleDtoToRole).collect(Collectors.toSet()));
-        if (userValidator.validate(userToBeUpdated)) {
-            User user = userRepository.save(userToBeUpdated);
-            eventPublisher.publishEvent(new UpdatedUserEvent(user.toString(),beforeUpdate,user.getUsername()));
-            return new TextResponse("User updated successfully!");
-        }
-        throw new InvalidRequestException("Invalid data!");
+        userValidator.validate(userToBeUpdated);
+        User user = userRepository.save(userToBeUpdated);
+        eventPublisher.publishEvent(new UpdatedUserEvent(user.toString(), beforeUpdate, user.getUsername()));
+        return new TextResponse("User updated successfully!");
     }
 
-    public TextResponse firstLogin(Long id, FirstLoginDto pd){
-        Optional<User> updatedUser=userRepository.findById(id);
-        if(!updatedUser.isPresent()){
+    public TextResponse firstLogin(Long id, FirstLoginDto pd) {
+        Optional<User> updatedUser = userRepository.findById(id);
+        if (!updatedUser.isPresent()) {
             throw new UsernameNotFoundException("The user you are trying to change the password for  is not existent");
         }
         User user = updatedUser.get();
@@ -100,28 +95,28 @@ public class UserService {
         return new TextResponse("Password changed successfully");
     }
 
-    public TextResponse toggleActivation(Long id){
+    public TextResponse toggleActivation(Long id) {
         boolean activation = false;
         User updatedUser = userRepository.findById(id).get();
-        if(!updatedUser.isActive()){
+        if (!updatedUser.isActive()) {
             activation = true;
         }
         updatedUser.setActive(!updatedUser.isActive());
         User user = userRepository.save(updatedUser);
-        if(!activation) {
+        if (!activation) {
             eventPublisher.publishEvent(new DeletedUserEvent(user));
             return new TextResponse("User deactivated successfully");
-        }else{
+        } else {
             return new TextResponse("User activated successfully");
         }
     }
 
     public UserDto findById(Long id) {
-        Optional<User> user =  userRepository.findById(id);
-        if(user.isPresent()){
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
             return userMapper.userToUserDto(user.get());
         }
-        throw new UserNotFoundException("There is no user  with the id = " + id);
+        throw new InvalidRequestException("There is no user  with the id = " + id);
     }
 
     public TextResponse deleteUserById(Long id) {
@@ -131,50 +126,44 @@ public class UserService {
 
     public TextResponse saveUser(CreateUserDto userDto) {
         if (userDto.getRoles().size() > 0) {
-            User userToSave = createUserMapper.createUserDtoToUser(userDto);
-            if (userValidator.validate(userToSave)) {
-                userToSave.setUsername(serviceUtils.generateUsername(userToSave, userRepository.findAll()));
-                String password = serviceUtils.generateUUID();
-                userToSave.setPassword(passwordEncoder.encode(password));
-                User user = userRepository.save(userToSave);
-                eventPublisher.publishEvent(new NewUserEvent(user));
-                serviceUtils.sendSimpleMessage(user, password);
-                return new TextResponse("User created registered successfully!");
-            }else{
-                throw new InvalidRequestException("Invalid data!");
-            }
+            User userToSave = CreateUserMapper.createUserDtoToUser(userDto);
+            userValidator.validate(userToSave);
+            userToSave.setUsername(serviceUtils.generateUsername(userToSave, userRepository.findAll()));
+            String password = serviceUtils.generateUUID();
+            userToSave.setPassword(passwordEncoder.encode(password));
+            User user = userRepository.save(userToSave);
+            mailService.sendSimpleMessage(user,password);
+            eventPublisher.publishEvent(new NewUserEvent(user));
+            return new TextResponse("User created registered successfully!");
         }
         throw new InvalidRequestException("You cannot save a user without any roles !");
     }
 
     public List<UserDto> getAllUsers() {
-//        return  this.userRepository.findAll().stream().map(userMapper::userToUserDto).collect(Collectors.toList());
-        List<User> users=userRepository.findAll();
-        return userMapper.usersToUserDtos(users);
+        return this.userRepository.findAll().stream().map(userMapper::userToUserDto).collect(Collectors.toList());
     }
 
-    public long getSize(){
+    public long getSize() {
         return userRepository.count();
     }
 
-    public TextResponse addCampaignsToREP(List<CampaignDto> campaigns,Long userID){
+    public TextResponse addCampaignsToREP(List<CampaignDto> campaigns, Long userID) {
         Optional<User> foundUser = this.userRepository.findById(userID);
-        if(!foundUser.isPresent()){
-            throw new  UserNotFoundException("The user you are trying to add the campaigns does not exists!");
+        if (!foundUser.isPresent()) {
+            throw new InvalidRequestException("The user you are trying to add the campaigns does not exists!");
         }
         User user = foundUser.get();
         boolean hasRoleREP = false;
-        for(Role role : user.getRoles()){
-            if(role.getName().name().equals(ERole.REP.name())){
+        for (Role role : user.getRoles()) {
+            if (role.getName().name().equals(ERole.REP.name())) {
                 hasRoleREP = true;
+                break;
             }
         }
-        if(!hasRoleREP){
-            throw new   InvalidRequestException("The user doesn't have  the  necessary role!");
+        if (!hasRoleREP) {
+            throw new InvalidRequestException("The user doesn't have  the  necessary role!");
         }
-       user.getCampaigns().addAll(campaigns.stream().map(campaignMapper::campaignDtoToCampaign).collect(Collectors.toSet()));
-//        Set<Campaign> userCampaigns=user.getCampaigns();
-//        userCampaigns = (Set<Campaign>) campaignMapper.campaignDtosToCampaigns(campaigns);
+        user.getCampaigns().addAll(campaigns.stream().map(campaignMapper::campaignDtoToCampaign).collect(Collectors.toSet()));
         userRepository.save(user);
         return new TextResponse("The  campaigns were added successfully!");
     }

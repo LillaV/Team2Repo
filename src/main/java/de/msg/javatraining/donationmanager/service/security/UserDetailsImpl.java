@@ -6,7 +6,6 @@ import de.msg.javatraining.donationmanager.persistence.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -14,21 +13,17 @@ import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
-    private Long id;
-    private String username;
-    private String email;
-    private Boolean active;
+    private final Long id;
+    private final String username;
+    private final String email;
+    private final Boolean active;
     @JsonIgnore
-    private String password;
-    private Boolean newUser;
-
+    private final String password;
+    private final Boolean newUser;
+    private final Collection<? extends GrantedAuthority> authorities;
     private Integer failedLoginAttempts;
 
-
-    private Collection<? extends GrantedAuthority> authorities;
-
-    public UserDetailsImpl(Long id, String username, String email, String password,
-                           Collection<? extends GrantedAuthority> authorities, Boolean active, Boolean newUser) {
+    public UserDetailsImpl(Long id, String username, String email, String password, Collection<? extends GrantedAuthority> authorities, Boolean active, Boolean newUser) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -40,19 +35,10 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(User user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream().map(role -> role.getPermissions().stream()
-                        .map(permission -> new SimpleGrantedAuthority(permission.getPermission().name())).collect(Collectors.toList()))
-                .flatMap(List::stream).collect(Collectors.toList());
+        List<GrantedAuthority> authorities = user.getRoles().stream().map(role -> role.getPermissions().stream().map(permission -> new SimpleGrantedAuthority(permission.getPermission().name())).collect(Collectors.toList())).flatMap(List::stream).collect(Collectors.toList());
 
 
-        return new UserDetailsImpl(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getPassword(),
-                authorities,
-                user.isActive(),
-                user.isNewUser());
+        return new UserDetailsImpl(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), authorities, user.isActive(), user.isNewUser());
     }
 
     @Override
@@ -104,10 +90,8 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(id, user.id);
     }

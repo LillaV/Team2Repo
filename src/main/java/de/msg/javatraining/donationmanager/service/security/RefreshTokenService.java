@@ -23,20 +23,20 @@ public class RefreshTokenService {
     private UserDetailsServiceImpl userDetailsService;
 
 
-    public void createRefreshToken(String uuid,Long userId){
+    public void createRefreshToken(String uuid, Long userId) {
         Optional<User> user = userRepository.findById(userId);
-        if(user.isPresent()) {
-            RefreshToken refreshToken = new RefreshToken(uuid,user.get(), Instant.now().plusSeconds(84000));
+        if (user.isPresent()) {
+            RefreshToken refreshToken = new RefreshToken(user.get(), uuid, Instant.now().plusSeconds(84000));
             refreshTokenRepository.save(refreshToken);
         }
     }
 
-    public String exchangeRefreshToken(String refreshToken){
+    public String exchangeRefreshToken(String refreshToken) {
         Optional<RefreshToken> token = refreshTokenRepository.findById(refreshToken);
-        if(!token.isPresent()){
+        if (!token.isPresent()) {
             throw new InvalidRefreshTokenException("The refresh token is inexistent");
         }
-        if(token.get().getExpiryDate().isBefore(Instant.now())){
+        if (token.get().getExpiryDate().isBefore(Instant.now())) {
             throw new InvalidRefreshTokenException("The refresh token is expired");
         }
         return jwtUtils.generateJwtToken(userDetailsService.loadUserByUsername(token.get().getUser().getUsername()));

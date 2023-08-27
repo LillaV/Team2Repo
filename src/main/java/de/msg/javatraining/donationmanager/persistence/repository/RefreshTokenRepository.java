@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken,String> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
     @Modifying
     @Query("delete from RefreshToken where user.id = :id")
-    void deleteRefreshTokenByUser( @Param("id")Long id);
+    void deleteRefreshTokenByUser(@Param("id") Long id);
 }

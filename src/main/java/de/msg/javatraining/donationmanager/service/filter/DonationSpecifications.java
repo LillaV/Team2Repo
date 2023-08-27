@@ -1,10 +1,9 @@
 package de.msg.javatraining.donationmanager.service.filter;
 
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
-import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +77,6 @@ public class DonationSpecifications {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("approvedDate"), approvedDateEnd));
             }
 
-            // Combine predicates
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

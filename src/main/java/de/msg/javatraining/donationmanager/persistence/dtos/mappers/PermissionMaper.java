@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 @Mapper
 public interface PermissionMaper {
     Permission permisssionDTOToPermission(PermissionDTO permissionDTO);
+
     PermissionDTO permissionToPermissionDTO(Permission permission);
 }
 

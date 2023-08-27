@@ -94,7 +94,7 @@ public class DonationController {
         Donation donationDto = donationService.findById(id);
         if (!donationDto.getApproved()) {
             donationService.deleteDonation(id);
-            return new TextResponse("Donation updated successfully!");
+            return new TextResponse("Donation deleted successfully!");
         } else {
             return new TextResponse("Donation is already approved, you cannot delete it anymore.");
         }

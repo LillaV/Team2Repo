@@ -1,5 +1,6 @@
 package de.msg.javatraining.donationmanager.service;
 
+import de.msg.javatraining.donationmanager.config.exception.InvalidRequestException;
 import de.msg.javatraining.donationmanager.persistence.dtos.donator.SimpleDonatorDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonatorMapper;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
@@ -157,7 +158,7 @@ class DonatorServiceTest {
 
         when(donatorRepository.findById(4L)).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class,()->donatorService.findById(4L));
+        assertThrows(InvalidRequestException.class,()->donatorService.findById(4L));
     }
 
     @Test
@@ -165,17 +166,12 @@ class DonatorServiceTest {
         List<Donator> donList=generate();
 
         when(donationRepository.existsByBenefactorId(donList.get(0).getId())).thenReturn(true);
-        when(donatorRepository.findById(donList.get(0).getId())).thenReturn(Optional.of(donList.get(0)));
-        donList.get(0).setFirstName("Unknown");
-        donList.get(0).setLastName("Unknown");
-        donList.get(0).setAdditionalName("Unknown");
-        donList.get(0).setMaidenName("Unknown");
-        when(donatorRepository.save(donList.get(0))).thenReturn(donList.get(0));
+        doNothing().when(donationRepository).deleteBenefactorId(donList.get(0).getId());
 
         donatorService.deleteDonatorById(donList.get(0).getId());
 
         verify(donationRepository).existsByBenefactorId(donList.get(0).getId());
-        verify(donatorRepository).save(donList.get(0));
+        verify(donationRepository).deleteBenefactorId(donList.get(0).getId());
     }
 
     @Test
@@ -188,22 +184,6 @@ class DonatorServiceTest {
         donatorService.deleteDonatorById(donList.get(0).getId());
 
         verify(donatorRepository).deleteById(donList.get(0).getId());
-    }
-
-    @Test
-    public void setToUnknown_executeUpdate_inAllCases(){
-        Donator donator=new Donator(1L,"First","Last","Additional","");
-
-        when(donatorRepository.findById(1L)).thenReturn(Optional.of(donator));
-        donator.setFirstName("Unknown");
-        donator.setLastName("Unknown");
-        donator.setAdditionalName("Unknown");
-        donator.setMaidenName("Unknown");
-        when(donatorRepository.save(donator)).thenReturn(donator);
-
-        donatorService.setToUnknown(1L);
-
-        verify(donatorRepository).save(donator);
     }
 
     @Test

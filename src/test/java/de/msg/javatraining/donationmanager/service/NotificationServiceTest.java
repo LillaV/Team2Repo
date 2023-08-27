@@ -134,9 +134,9 @@ class NotificationServiceTest {
         Set<User> users=new HashSet<>();
         User user1=new User(1L,"Andrei","Banu",true,false,"andrban1","","andr@yahoo.com",campaigns,"password",roles,0);
         User user2=new User(2L,"Andre","Ban",true,false,"andban1","","andre@yahoo.com",campaigns,"passwor",roles,0);
-        Campaign campaign=new Campaign(1L,"Unicef","Help me",donations);
+        Campaign campaign=new Campaign("Unicef","Help me",donations);
         Donator donator=new Donator(1L,"Vivi","Lang","","");
-        Donation donation=new Donation(1L,"EUR",1000,LocalDate.now(),true,LocalDate.now(),"",user1,user2,campaign,donator);
+        Donation donation=new Donation(1L,"EUR",1000F,LocalDate.now(),true,LocalDate.now(),"",user1,user2,campaign,donator);
         users.add(user1);
         DonationApprovedEvent event=new DonationApprovedEvent(donation);
         Notification notification=new Notification(1L,"Success", LocalDate.now(),users);

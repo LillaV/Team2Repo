@@ -33,19 +33,6 @@ class NotificationControllerTest {
     }
 
     @Test
-    public void myNotifications_returnsPaginationDto_inAllCases(){
-        List<NotificationDTO> dtos=generateDtos();
-        NotificationPaginationDTO paginationDTO=new NotificationPaginationDTO(dtos, 5L);
-
-        when(notificationService.getNotifications(5,3,1L)).thenReturn(paginationDTO);
-
-        NotificationPaginationDTO res=notificationController.myNotifications(5,3,1L);
-
-        verify(notificationService).getNotifications(5,3,1L);
-        assertEquals(paginationDTO,res);
-    }
-
-    @Test
     public void myNotifications_returnsList_whenOffsetAndSizeNotNull(){
         List<NotificationDTO> dtos=generateDtos();
 
@@ -61,11 +48,11 @@ class NotificationControllerTest {
     public void myNotifications_returnsList_whenOffsetAndSizeNull(){
         List<NotificationDTO> dtos=generateDtos();
 
-        when(notificationService.getNotificationsWithPagination(1L,0,3)).thenReturn(dtos);
+        when(notificationService.recentNotifications(1L)).thenReturn(dtos);
 
         List<NotificationDTO> res=notificationController.myNotifications(1L,null,null);
 
-        verify(notificationService).getNotificationsWithPagination(1L,0,3);
+        verify(notificationService).recentNotifications(1L);
         assertEquals(dtos,res);
     }
 

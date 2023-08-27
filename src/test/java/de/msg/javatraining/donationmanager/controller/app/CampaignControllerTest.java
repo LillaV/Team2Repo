@@ -1,6 +1,7 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.service.CampaignService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -72,7 +73,8 @@ class CampaignControllerTest {
     @Test
     public void saveCampaign_saveSuccessful_whenValid(){
         List<CampaignDto> dtos=generateDtos();
-        doNothing().when(campaignService).saveCampaign(dtos.get(0));
+        TextResponse textResponse=new TextResponse("Campaign saved successfully!");
+        when(campaignService.saveCampaign(dtos.get(0))).thenReturn(textResponse);
 
         ResponseEntity<String> response=campaignController.saveCampaign(dtos.get(0));
 
@@ -84,7 +86,8 @@ class CampaignControllerTest {
     @Test
     public void updateCampaign_updateSuccessful_whenValid(){
         List<CampaignDto> dtos=generateDtos();
-        doNothing().when(campaignService).updateCampaign(dtos.get(0).getId(),dtos.get(0));
+        TextResponse textResponse=new TextResponse("Campaign saved successfully!");
+        when(campaignService.updateCampaign(dtos.get(0).getId(),dtos.get(0))).thenReturn(textResponse);
 
         ResponseEntity response=campaignController.updateCampaign(dtos.get(0).getId(),dtos.get(0));
 
@@ -108,7 +111,8 @@ class CampaignControllerTest {
     @Test
     public void deleteCampaignById_deleteSuccessful_whenValid(){
         List<CampaignDto> dtos=generateDtos();
-        doNothing().when(campaignService).deleteCampaignById(dtos.get(0).getId());
+        TextResponse textResponse=new TextResponse("Campaign deleted successfully!");
+        when(campaignService.deleteCampaignById(dtos.get(0).getId())).thenReturn(textResponse);
 
         ResponseEntity response=campaignController.deleteCampaignById(dtos.get(0).getId());
 

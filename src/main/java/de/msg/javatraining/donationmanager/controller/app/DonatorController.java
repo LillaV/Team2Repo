@@ -17,7 +17,7 @@ public class DonatorController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('BENEF_MANAGEMENT')")
-    public List<SimpleDonatorDto> getDonations(@RequestParam(name = "offset", required = false) Integer offset, @RequestParam(name = "pageSize", required = false) Integer pageSize) {
+    public List<SimpleDonatorDto> getDonators(@RequestParam(name = "offset", required = false) Integer offset, @RequestParam(name = "pageSize", required = false) Integer pageSize) {
         if (offset != null && pageSize != null) {
             return donatorService.allDonatorsWithPagination(offset, pageSize);
         } else {

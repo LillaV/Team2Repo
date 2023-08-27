@@ -1,6 +1,7 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.donator.SimpleDonatorDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.service.DonatorService;
 import org.hamcrest.Matchers;
@@ -84,24 +85,26 @@ class DonatorControllerTest {
     @Test
     public void saveDonator_saveSuccessful_whenValid(){
         List<SimpleDonatorDto> dtos=generateDtos();
-        doNothing().when(donatorService).saveDonator(dtos.get(0));
+        TextResponse textResponse=new TextResponse("Donator saved successfully");
+        when(donatorService.saveDonator(dtos.get(0))).thenReturn(textResponse);
 
-        ResponseEntity<String> response=donatorController.saveDonator(dtos.get(0));
+        TextResponse response=donatorController.saveDonator(dtos.get(0));
 
         verify(donatorService).saveDonator(dtos.get(0));
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(textResponse.getText(),response.getText());
     }
 
     @Test
     public void updateDonator_updateSuccessful_whenValid(){
         List<Donator> donators=generate();
         List<SimpleDonatorDto> dtos=generateDtos();
-        when(donatorService.updateDonator(dtos.get(0).getId(),dtos.get(0))).thenReturn(donators.get(0));
+        TextResponse textResponse=new TextResponse("Donator updated successfully");
+        when(donatorService.updateDonator(dtos.get(0).getId(),dtos.get(0))).thenReturn(textResponse);
 
-        ResponseEntity response=donatorController.updateDonator(dtos.get(0),dtos.get(0).getId());
+        TextResponse response=donatorController.updateDonator(dtos.get(0),dtos.get(0).getId());
 
         verify(donatorService).updateDonator(dtos.get(0).getId(),dtos.get(0));
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(textResponse.getText(),response.getText());
     }
 
     @Test
@@ -118,12 +121,12 @@ class DonatorControllerTest {
     @Test
     public void deleteDonatorById_deleteSuccessful_whenValid(){
         List<SimpleDonatorDto> dtos=generateDtos();
-        doNothing().when(donatorService).deleteDonatorById(dtos.get(0).getId());
+        TextResponse textResponse=new TextResponse("Donation deleted successfully!");
+        when(donatorService.deleteDonatorById(dtos.get(0).getId())).thenReturn(textResponse);
 
-        ResponseEntity response=donatorController.deleteDonatorById(dtos.get(0).getId());
+        TextResponse response=donatorController.deleteDonatorById(dtos.get(0).getId());
 
         verify(donatorService).deleteDonatorById(dtos.get(0).getId());
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Donator deleted", response.getBody());
+        assertEquals(textResponse.getText(),response.getText());
     }
 }

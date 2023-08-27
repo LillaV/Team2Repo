@@ -1,7 +1,7 @@
 package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.config.exception.InvalidRequestException;
-import de.msg.javatraining.donationmanager.config.exception.UserNotFoundException;
+import de.msg.javatraining.donationmanager.config.notifications.events.UpdatedUserEvent;
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CampaignMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
@@ -15,13 +15,12 @@ import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
-import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Permission;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
-import de.msg.javatraining.donationmanager.service.utils.UserServiceUtils;
+import de.msg.javatraining.donationmanager.service.utils.UserServiceHelper;
 import de.msg.javatraining.donationmanager.service.validation.UserValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,7 +53,7 @@ class UserServiceTest {
     @Mock
     PasswordEncoder passwordEncoder;
     @Mock
-    UserServiceUtils serviceUtils;
+    UserServiceHelper serviceUtils;
 
     @Mock
     UserValidator userValidator;
@@ -70,6 +69,9 @@ class UserServiceTest {
     @Mock
     CampaignMapper campaignMapper;
 
+    @Mock
+    MailService mailService;
+
     @InjectMocks
     UserService userService;
 
@@ -83,7 +85,7 @@ class UserServiceTest {
         createUserDto.setEmail("vlad.pasca17@gmail.com");
         createUserDto.setMobileNumber("0712345678");
         Set<CreateRoleDto> roleDtos = new HashSet<>();
-        roleDtos.add(new CreateRoleDto(ERole.ADM, new HashSet<PermissionDTO>()));
+        roleDtos.add(new CreateRoleDto(1,ERole.ADM, new HashSet<PermissionDTO>()));
         createUserDto.setRoles(roleDtos);
 
         userEntity.setId(1L);
@@ -100,19 +102,20 @@ class UserServiceTest {
         List<User> users = getUserEntities();
 
         when(createUserMapper.createUserDtoToUser(createUserDto)).thenReturn(userEntity);
-        when(userValidator.validate(userEntity)).thenReturn(true);
+        doNothing().when(userValidator).validate(userEntity);
         when(userRepository.findAll()).thenReturn(users);
         when(serviceUtils.generateUsername(userEntity, users)).thenReturn("lastnf");
         String password = "passwd";
         when(serviceUtils.generateUUID()).thenReturn(password);
         when(passwordEncoder.encode(password)).thenReturn("$2a$10$Z/OSRNFBmw5J.2P2g33/2OnH7qsxkiGfAaZpaTwg.UP0P466zmvVi");
         when(userRepository.save(userEntity)).thenReturn(userEntity);
+        when(mailService.sendSimpleMessage(userEntity,password)).thenReturn(password);
 
         TextResponse actualResponse = userService.saveUser(createUserDto);
         TextResponse expectedResponse = new TextResponse("User created registered successfully!");
 
 //        verify(eventPublisher).publishEvent(any());
-        verify(serviceUtils).sendSimpleMessage(userEntity, password);
+        verify(mailService).sendSimpleMessage(userEntity, password);
         verify(userRepository).save(userEntity);
 
         assertThat(actualResponse, equalTo(expectedResponse));
@@ -128,7 +131,7 @@ class UserServiceTest {
         createUserDto.setEmail("vlad.pasca17@gmail.com");
         createUserDto.setMobileNumber("0712345678");
         Set<CreateRoleDto> roleDtos = new HashSet<>();
-        roleDtos.add(new CreateRoleDto(ERole.ADM, new HashSet<PermissionDTO>()));
+        roleDtos.add(new CreateRoleDto(1,ERole.ADM, new HashSet<PermissionDTO>()));
         createUserDto.setRoles(roleDtos);
 
         invalidUserEntity.setId(1L);
@@ -143,7 +146,7 @@ class UserServiceTest {
         invalidUserEntity.setRoles(roles);
 
         when(createUserMapper.createUserDtoToUser(createUserDto)).thenReturn(invalidUserEntity);
-        when(userValidator.validate(invalidUserEntity)).thenReturn(false);
+        doNothing().when(userValidator).validate(invalidUserEntity);
 
         assertThrows(InvalidRequestException.class, () -> userService.saveUser(createUserDto));
 
@@ -221,7 +224,7 @@ class UserServiceTest {
         when(userRepository.findById(userID)).thenReturn(Optional.of(user));
         user.setFirstName("USERNEW");
         when(userRepository.save(user)).thenReturn(user);
-        when(userValidator.validate(user)).thenReturn(true);
+        doNothing().when(userValidator).validate(user);
 
 
         TextResponse actualResponse = userService.updateUser(userID, updateUserDto);
@@ -238,9 +241,6 @@ class UserServiceTest {
         updateUserDto.setLastName("toBeUpdated");
         updateUserDto.setMobileNumber("0700000000");
         Set<RoleDto> roleDtos = new HashSet<>();
-        RoleDto roleDto = new RoleDto();
-        roleDto.setName(ERole.ADM);
-        roleDtos.add(roleDto);
         updateUserDto.setRoles(roleDtos);
 
         User user = new User();
@@ -254,7 +254,6 @@ class UserServiceTest {
 
         when(userRepository.findById(userID)).thenReturn(Optional.of(user));
         user.setFirstName("USERNEW");
-        when(userValidator.validate(user)).thenReturn(false);
 
         assertThrows(InvalidRequestException.class, () -> userService.updateUser(userID, updateUserDto));
     }
@@ -351,7 +350,7 @@ class UserServiceTest {
     public void findById_searchFailed_whenUserIsNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class,() ->userService.findById(1L));
+        assertThrows(InvalidRequestException.class,() ->userService.findById(1L));
     }
 
     @Test
@@ -393,7 +392,7 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
         List<CampaignDto> campaignDtos = new ArrayList<>();
 
-        assertThrows(UserNotFoundException.class,() ->userService.addCampaignsToREP(campaignDtos,1L));
+        assertThrows(InvalidRequestException.class,() ->userService.addCampaignsToREP(campaignDtos,1L));
     }
     @Test
     public void addCampaignsToREP_addFailed_whenUserHasNotREPRole(){

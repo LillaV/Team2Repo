@@ -2,7 +2,9 @@ package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.permission.PermissionDTO;
 import de.msg.javatraining.donationmanager.persistence.dtos.permission.RolePermissionsDTO;
+import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.dtos.role.CreateRoleDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.role.RoleDto;
 import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
 import de.msg.javatraining.donationmanager.service.RoleService;
 import org.hamcrest.Matchers;
@@ -32,25 +34,25 @@ class RoleControllerTest {
     @InjectMocks
     RoleController roleController;
 
-    private List<CreateRoleDto> generateCreateDto(){
+    private List<RoleDto> generateDto(){
         Set<PermissionDTO> permissions=new HashSet<>();
-        List<CreateRoleDto> roles=new ArrayList<>();
+        List<RoleDto> roles=new ArrayList<>();
         PermissionDTO perm1=new PermissionDTO(1L,"Auth");
         PermissionDTO perm2=new PermissionDTO(1L,"Rep");
         permissions.add(perm1);
         permissions.add(perm2);
-        CreateRoleDto dto=new CreateRoleDto(ERole.ADM,permissions);
+        RoleDto dto=new RoleDto(1,ERole.ADM,permissions);
         roles.add(dto);
         return roles;
     }
 
     @Test
     public void findAll_returnsList_inAllCases(){
-        List<CreateRoleDto> dtos=generateCreateDto();
+        List<RoleDto> dtos=generateDto();
 
         when(roleService.findAll()).thenReturn(dtos);
 
-        List<CreateRoleDto> res=roleController.findAll();
+        List<RoleDto> res=roleController.findAll();
 
         verify(roleService).findAll();
         assertEquals(dtos,res);
@@ -63,14 +65,14 @@ class RoleControllerTest {
         PermissionDTO perm2=new PermissionDTO(1L,"Rep");
         permissions.add(perm1);
         permissions.add(perm2);
+        TextResponse textResponse=new TextResponse("The permissions were added accordingly!");
 
-        when(roleService.addPermission(permissions,1L)).thenReturn("Added permissions");
+        when(roleService.addPermission(permissions,1L)).thenReturn(textResponse);
 
-        ResponseEntity response=roleController.accordPermissions(1L,permissions);
+        TextResponse response=roleController.accordPermissions(1L,permissions);
 
         verify(roleService).addPermission(permissions,1L);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Added permissions", response.getBody());
+        assertEquals(textResponse.getText(),response.getText());
     }
 
     @Test
@@ -85,11 +87,11 @@ class RoleControllerTest {
         RolePermissionsDTO dto1=new RolePermissionsDTO(permissions1,permissions2,ERole.ADM,1);
         list.add(dto1);
 
-        when(roleService.getPermissions(1L)).thenReturn(list);
+        when(roleService.getPermissions()).thenReturn(list);
 
-        List<RolePermissionsDTO> res=roleController.getPermissions(1L);
+        List<RolePermissionsDTO> res=roleController.getPermissions();
 
-        verify(roleService).getPermissions(1L);
+        verify(roleService).getPermissions();
         assertThat(list, Matchers.is(res));
     }
 
@@ -100,13 +102,13 @@ class RoleControllerTest {
         PermissionDTO perm2=new PermissionDTO(1L,"Rep");
         permissions.add(perm1);
         permissions.add(perm2);
+        TextResponse textResponse=new TextResponse("All permissions were removed !!");
 
-        when(roleService.removePermissions(permissions,1L)).thenReturn("Removed permissions");
+        when(roleService.removePermissions(permissions,1L)).thenReturn(textResponse);
 
-        ResponseEntity response=roleController.removePermissions(1L,permissions);
+        TextResponse response=roleController.removePermissions(1L,permissions);
 
         verify(roleService).removePermissions(permissions,1L);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Removed permissions", response.getBody());
+        assertEquals(textResponse.getText(),response.getText());
     }
 }

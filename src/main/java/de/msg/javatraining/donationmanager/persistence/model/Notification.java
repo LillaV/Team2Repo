@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,13 +21,12 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Lob
-    @Column(columnDefinition="TEXT", length = 1000)
+    @Column(columnDefinition = "TEXT", length = 1000)
     private String text;
     private LocalDate date;
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "notification_user",
-            joinColumns = @JoinColumn(name = "notification_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JoinTable(name = "notification_user", joinColumns = @JoinColumn(name = "notification_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> users = new HashSet<>();
+
 
 }

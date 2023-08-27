@@ -1,8 +1,5 @@
 package de.msg.javatraining.donationmanager.config.notifications;
 
-import de.msg.javatraining.donationmanager.persistence.model.*;
-import de.msg.javatraining.donationmanager.persistence.model.enums.EPermission;
-import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
 import de.msg.javatraining.donationmanager.persistence.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +9,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
-import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import static java.rmi.server.LogStream.log;
 
 @Configuration
 @EnableScheduling

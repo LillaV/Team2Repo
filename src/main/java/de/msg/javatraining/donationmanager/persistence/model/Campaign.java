@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -20,6 +18,8 @@ import java.util.Set;
         })
 public class Campaign {
 
+    @OneToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true, fetch = FetchType.EAGER)
+    Set<Donation> donations;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,8 +27,6 @@ public class Campaign {
     private String name;
     @Column(nullable = false)
     private String purpose;
-    @OneToMany(cascade = {CascadeType.REMOVE,CascadeType.PERSIST} , orphanRemoval = true,fetch = FetchType.EAGER)
-    Set<Donation> donations;
 
     public Campaign(String name, String purpose, Set<Donation> donations) {
         this.name = name;

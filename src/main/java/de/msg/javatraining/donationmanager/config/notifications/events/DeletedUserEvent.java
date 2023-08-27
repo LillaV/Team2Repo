@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class DeletedUserEvent extends BaseEvent{
-    User user;
+    private User user;
     public DeletedUserEvent(User user) {
         super(EventType.USER_DELETED);
         this.user = user;

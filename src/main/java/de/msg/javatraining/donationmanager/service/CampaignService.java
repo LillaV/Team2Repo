@@ -8,8 +8,6 @@ import de.msg.javatraining.donationmanager.persistence.dtos.response.TextRespons
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
-import de.msg.javatraining.donationmanager.persistence.model.CampaignFilterPair;
-import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.persistence.repository.CampaignRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.DonationRepository;

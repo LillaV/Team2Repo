@@ -5,8 +5,6 @@ import com.sun.mail.iap.ByteArray;
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignFilterPair;
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
-import de.msg.javatraining.donationmanager.persistence.model.CampaignFilterPair;
-import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.service.CampaignService;
 import de.msg.javatraining.donationmanager.service.filter.CampaignSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;

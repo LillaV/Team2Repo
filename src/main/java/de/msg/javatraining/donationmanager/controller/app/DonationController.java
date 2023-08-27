@@ -193,7 +193,7 @@ public class DonationController {
                 String benefactorName = donation.getBenefactor() != null ?
                         donation.getBenefactor().getFirstName() + " " + donation.getBenefactor().getLastName() :
                         "Unknown";
-                String approved = donation.isApproved() ? "Yes" : "No";
+                String approved = donation.getApproved() ? "Yes" : "No";
                 String approvedByName = donation.getApprovedBy() != null ?
                         donation.getApprovedBy().getFirstName() + " " + donation.getApprovedBy().getLastName() : "";
                 String approvalDate = donation.getApprovedDate() != null ?

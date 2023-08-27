@@ -78,12 +78,8 @@ public class DonationController {
     public TextResponse updateDonation(@RequestBody() UpdateDonationDto updateDonationDto, @PathVariable("id") Long id) {
         Donation donation = donationService.findById(id);
         if (!donation.getApproved()) {
-            if (!donation.getApproved()) {
                 donationService.updateDonation(id, updateDonationDto);
                 return new TextResponse("Donation updated");
-            } else {
-                return new TextResponse("Donation is already approved, you cannot edit it anymore.");
-            }
         }
         throw new InvalidRequestException("The donation you are trying to modify can't be updated");
     }

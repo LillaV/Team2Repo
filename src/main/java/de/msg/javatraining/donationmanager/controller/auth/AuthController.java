@@ -1,6 +1,7 @@
 package de.msg.javatraining.donationmanager.controller.auth;
 
 
+import de.msg.javatraining.donationmanager.config.exception.InvalidRequestException;
 import de.msg.javatraining.donationmanager.config.notifications.events.UserDeactivatedEvent;
 import de.msg.javatraining.donationmanager.config.security.JwtUtils;
 import de.msg.javatraining.donationmanager.persistence.model.User;
@@ -12,10 +13,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,22 +34,22 @@ import java.util.stream.Collectors;
 public class AuthController {
   private static final String REFRESHTOKEN_COOKIE_NAME = "RefreshTokenCookie";
   @Autowired
-  AuthenticationManager authenticationManager;
+  private AuthenticationManager authenticationManager;
 
   @Autowired
-  UserRepository userRepository;
+  private UserRepository userRepository;
 
   @Autowired
-  RoleRepository roleRepository;
+  private RoleRepository roleRepository;
 
   @Autowired
-  PasswordEncoder encoder;
+  private PasswordEncoder encoder;
 
   @Autowired
-  JwtUtils jwtUtils;
+  private JwtUtils jwtUtils;
 
   @Autowired
-  RefreshTokenService refreshTokenService;
+  private RefreshTokenService refreshTokenService;
   @Autowired
   private ApplicationEventPublisher eventPublisher;
 
@@ -103,6 +101,9 @@ public class AuthController {
   public ResponseEntity<?> checkCookie(HttpServletRequest request) {
     Optional<Cookie> cookie = Arrays.stream(request.getCookies()).filter(c -> c.getName().equals(REFRESHTOKEN_COOKIE_NAME)).findFirst();
     if(cookie.isPresent()) {
+      if(!refreshTokenService.validateToken(cookie.get().getValue())){
+        throw new InvalidRequestException("The token is invalid try login in");
+      }
       return new ResponseEntity<>(new RefreshTokenResponse(refreshTokenService.exchangeRefreshToken(cookie.get().getValue())),HttpStatus.OK);
     }
     throw new RuntimeException("Cookie was not set");

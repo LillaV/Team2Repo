@@ -104,6 +104,10 @@ public class CampaignService {
         return new CampaignFilterPair(campaigns.stream().collect(Collectors.toList()), size);
     }
 
+    public List<CampaignDto> searchForCampaigns(String searchText){
+        return campaignRepository.searchForCampaign(searchText,PageRequest.of(0,6)).stream().map(campaignMapper::campaignToCampaignDto).collect(Collectors.toList());
+    }
+
     public long getSize() {
         return campaignRepository.count();
     }

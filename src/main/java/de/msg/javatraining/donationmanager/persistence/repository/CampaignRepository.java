@@ -20,4 +20,7 @@ public interface CampaignRepository  extends JpaRepository<Campaign, Long>, JpaS
 
     @Query("select c from  Campaign c join User  u join u.campaigns uc on uc.id= c.id and u.id = :userId")
     Page<Campaign> getCustomCampaignList(@Param("userId")Long id, PageRequest of);
+
+    @Query("select c from  Campaign c where c.name like '%:text%'")
+    Page<Campaign> searchForCampaign(@Param("text")String text,PageRequest pageRequest);
 }

@@ -13,11 +13,6 @@ public class NotificationController {
     @Autowired
     NotificationService service;
 
-    @GetMapping("/{load}/{number}/{userId}")
-    public NotificationPaginationDTO myNotifications(@PathVariable("load") int load, @PathVariable("number") int number, @PathVariable("userId") long userId) {
-        return service.getNotifications(load, number, userId);
-    }
-
     @GetMapping("/{userId}")
     public List<NotificationDTO> myNotifications(
             @PathVariable("userId") Long userId,
@@ -26,7 +21,7 @@ public class NotificationController {
         if (offset != null && pageSize != null) {
             return service.getNotificationsWithPagination(userId, offset, pageSize);
         } else {
-            return service.getNotificationsWithPagination(userId, 0, 3);
+            return service.recentNotifications(userId);
         }
     }
 

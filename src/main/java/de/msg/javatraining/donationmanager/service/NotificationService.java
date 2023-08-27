@@ -92,15 +92,8 @@ public class NotificationService {
         messagingTemplate.convertAndSend("/topic/" + event.getDonation().getCreatedBy().getUsername(), mapper.notificationToNotificationDTO(notification));
     }
 
-    public NotificationPaginationDTO getNotifications(int load, int number, long userId) {
-        Page<Notification> notifications = notificationRepository.findAll(PageRequest.of(load, number));
-        List<NotificationDTO> notificationsList = notifications.stream().map(notification -> mapper.notificationToNotificationDTO(notification)).collect(Collectors.toList());
-        Long usersNotificationsCnt = notificationRepository.getPossibleMaxPage(userId);
-        return new NotificationPaginationDTO(notificationsList, usersNotificationsCnt / number);
-    }
-
     public List<NotificationDTO> recentNotifications(Long userId) {
-        Page<Notification> notifications = notificationRepository.getUserNotifications(userId, PageRequest.of(0, 3));
+        Page<Notification> notifications = notificationRepository.recentNotifications(userId, PageRequest.of(0, 3));
         return notifications.stream().map(mapper::notificationToNotificationDTO).collect(Collectors.toList());
     }
 

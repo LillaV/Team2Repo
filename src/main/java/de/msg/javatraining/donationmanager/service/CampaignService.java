@@ -8,6 +8,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.response.TextRespons
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
+import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.persistence.repository.CampaignRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.DonationRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.UserRepository;
@@ -104,11 +105,19 @@ public class CampaignService {
         return new CampaignFilterPair(campaigns.stream().collect(Collectors.toList()), size);
     }
 
+    public List<Campaign> filterCampaigns(Specification<Campaign> spec){
+        return campaignRepository.findAll(spec);
+    }
+
     public List<CampaignDto> searchForCampaigns(String searchText){
         return campaignRepository.searchForCampaign(searchText,PageRequest.of(0,6)).stream().map(campaignMapper::campaignToCampaignDto).collect(Collectors.toList());
     }
 
     public long getSize() {
         return campaignRepository.count();
+    }
+
+    public List<Donator> getDistinctBenefactorsByCampaignId(Long campaignId) {
+        return donationRepository.findDistinctBenefactorsByCampaignId(campaignId);
     }
 }

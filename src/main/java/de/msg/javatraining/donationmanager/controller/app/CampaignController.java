@@ -95,4 +95,74 @@ public class CampaignController {
         return this.campaignService.searchForCampaigns(text);
     }
 
+
+    @GetMapping("/export-csv")
+    public ResponseEntity<ByteArrayResource> exportCsv(
+            @RequestParam(name = "nameTerm", required = false) String nameTerm,
+            @RequestParam(name = "purposeTerm", required = false) String purposeTerm
+    ){
+        Specification<Campaign> spec = campaignSpecifications.filterCampaigns(
+                nameTerm, purposeTerm
+        );
+
+        List<Campaign> campaigns = campaignService.filterCampaigns(spec);
+
+        byte[] csvData = generateCsvData(campaigns);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "Campaigns.csv");
+
+        ByteArrayResource resource = new ByteArrayResource(csvData);
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(resource);
+    }
+
+    private byte[] generateCsvData(List<Campaign> campaigns)  {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(outputStream))) {
+            String[] header = {
+                    "Name", "Purpose", "Donators"
+            };
+            csvWriter.writeNext(header);
+
+            List<String[]> rows = new ArrayList<>();
+            for (Campaign campaign: campaigns){
+                    String donatorsInfo = campaignService.getDistinctBenefactorsByCampaignId(campaign.getId()).stream()
+                            .map(donator -> {
+                                if (donator != null) {
+                                    StringBuilder donatorInfoBuilder = new StringBuilder(donator.getFirstName());
+                                    if (donator.getAdditionalName() != null) {
+                                        donatorInfoBuilder.append(" ").append(donator.getAdditionalName());
+                                    }
+                                    if (donator.getMaidenName() != null) {
+                                        donatorInfoBuilder.append(" (Maiden: ").append(donator.getMaidenName()).append(")");
+                                    }
+                                    donatorInfoBuilder.append(" ").append(donator.getLastName());
+                                    return donatorInfoBuilder.toString();
+                                }
+                                return "";
+                            })
+                            .collect(Collectors.joining(", "));
+
+                String[] row = {
+                        campaign.getName(),
+                        campaign.getPurpose(),
+                        donatorsInfo
+                };
+
+                rows.add(row);
+            }
+
+            csvWriter.writeAll(rows);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return outputStream.toByteArray();
+    }
 }

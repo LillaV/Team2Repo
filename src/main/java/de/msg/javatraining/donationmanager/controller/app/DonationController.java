@@ -121,38 +121,88 @@ public class DonationController {
     }
 
     @GetMapping("/export-csv")
-    @PreAuthorize("hasAuthority(DONATION_REPORTING)")
-    public ResponseEntity<ByteArrayResource> exportCsv(@RequestParam(name = "minAmount", required = false) Float minValue, @RequestParam(name = "maxAmount", required = false) Float maxValue, @RequestParam(name = "value", required = false) Float value, @RequestParam(name = "currency", required = false) String currency, @RequestParam(name = "campaignId", required = false) Long campaignId, @RequestParam(name = "searchTerm", required = false) String searchTerm, @RequestParam(name = "createdById", required = false) Long createdById, @RequestParam(name = "createDateStart", required = false) LocalDate startDate, @RequestParam(name = "createDateEnd", required = false) LocalDate endDate, @RequestParam(name = "benefactorId", required = false) Long benefactorId, @RequestParam(name = "approved", required = false) Boolean approved, @RequestParam(name = "approvedById", required = false) Long approvedById, @RequestParam(name = "approvedDateStart", required = false) LocalDate approvedDateStart, @RequestParam(name = "approvedDateEnd", required = false) LocalDate approvedDateEnd) {
-        Specification<Donation> spec = donationSpecifications.filterDonations(minValue, maxValue, value, currency, campaignId, searchTerm, createdById, startDate, endDate, benefactorId, approved, approvedById, approvedDateStart, approvedDateEnd);
+    public ResponseEntity<ByteArrayResource> exportCsv(
+            @RequestParam(name = "minAmount", required = false) Float minValue,
+            @RequestParam(name = "maxAmount", required = false) Float maxValue,
+            @RequestParam(name = "value", required = false) Float value,
+            @RequestParam(name = "currency", required = false) String currency,
+            @RequestParam(name = "campaignId", required = false) Long campaignId,
+            @RequestParam(name = "searchTerm", required = false) String searchTerm,
+            @RequestParam(name = "createdById", required = false) Long createdById,
+            @RequestParam(name = "createDateStart", required = false) LocalDate startDate,
+            @RequestParam(name = "createDateEnd", required = false) LocalDate endDate,
+            @RequestParam(name = "benefactorId", required = false) Long benefactorId,
+            @RequestParam(name = "approved", required = false) Boolean approved,
+            @RequestParam(name = "approvedById", required = false) Long approvedById,
+            @RequestParam(name = "approvedDateStart", required = false) LocalDate approvedDateStart,
+            @RequestParam(name = "approvedDateEnd", required = false) LocalDate approvedDateEnd) {
+        Specification<Donation> spec = donationSpecifications.filterDonations(
+                minValue, maxValue, value, currency,
+                campaignId, searchTerm, createdById,
+                startDate, endDate,
+                benefactorId, approved,
+                approvedById, approvedDateStart, approvedDateEnd
+        );
         List<Donation> filteredDonations = donationService.filterDonations(spec);
+
         byte[] csvData = generateCsvData(filteredDonations);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", "filteredDonations.csv");
+        headers.setContentDispositionFormData("attachment", "Donations.csv");
+
         ByteArrayResource resource = new ByteArrayResource(csvData);
-        return ResponseEntity.ok().headers(headers).body(resource);
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(resource);
     }
 
     private byte[] generateCsvData(List<Donation> filteredDonations) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(outputStream))) {
-            String[] header = {"Amount", "Currency", "Campaign", "Creator", "Creation Date", "Benefactor", "Approved", "Approved By", "Approval Date", "Notes"};
+
+            String[] header = {
+                    "Amount", "Currency", "Campaign", "Creator", "Creation Date",
+                    "Benefactor", "Approved", "Approved By", "Approval Date", "Notes"
+            };
             csvWriter.writeNext(header);
+
             List<String[]> rows = new ArrayList<>();
             for (Donation donation : filteredDonations) {
                 String creatorFullName = donation.getCreatedBy().getFirstName() + " " + donation.getCreatedBy().getLastName();
-                String benefactorName = donation.getBenefactor() != null ? donation.getBenefactor().getFirstName() + " " + donation.getBenefactor().getLastName() : "Unknown";
+                String benefactorName = donation.getBenefactor() != null ?
+                        donation.getBenefactor().getFirstName() + " " + donation.getBenefactor().getLastName() :
+                        "Unknown";
                 String approved = donation.getApproved() ? "Yes" : "No";
-                String approvedByName = donation.getApprovedBy() != null ? donation.getApprovedBy().getFirstName() + " " + donation.getApprovedBy().getLastName() : "";
-                String approvalDate = donation.getApprovedDate() != null ? String.valueOf(donation.getApprovedDate()) : "";
+                String approvedByName = donation.getApprovedBy() != null ?
+                        donation.getApprovedBy().getFirstName() + " " + donation.getApprovedBy().getLastName() : "";
+                String approvalDate = donation.getApprovedDate() != null ?
+                        String.valueOf(donation.getApprovedDate()) : "";
                 String notes = donation.getNotes() != null ? donation.getNotes() : "";
-                String[] row = {String.valueOf(donation.getAmount()), donation.getCurrency(), donation.getCampaign().getName(), creatorFullName, String.valueOf(donation.getCreateDate()), benefactorName, approved, approvedByName, approvalDate, notes};
+
+                String[] row = {
+                        String.valueOf(donation.getAmount()),
+                        donation.getCurrency(),
+                        donation.getCampaign().getName(),
+                        creatorFullName,
+                        String.valueOf(donation.getCreateDate()),
+                        benefactorName,
+                        approved,
+                        approvedByName,
+                        approvalDate,
+                        notes
+                };
+
                 rows.add(row);
             }
+
             csvWriter.writeAll(rows);
         } catch (IOException e) {
-            throw new InvalidRequestException("Something went wrong  while writing the csv file!");
+            System.out.println(e.getMessage());
         }
+
         return outputStream.toByteArray();
     }
 }

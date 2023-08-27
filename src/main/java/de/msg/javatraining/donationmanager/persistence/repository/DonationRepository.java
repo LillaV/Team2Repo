@@ -2,6 +2,7 @@ package de.msg.javatraining.donationmanager.persistence.repository;
 
 import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
+import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -23,4 +24,6 @@ public interface DonationRepository extends JpaRepository<Donation, Long>, JpaSp
     @Query("UPDATE Donation d SET d.benefactor = null WHERE d.benefactor.id = :donatorId")
     void deleteBenefactorId(@Param("donatorId") Long benefactorId);
 
+    @Query("SELECT DISTINCT d.benefactor FROM Donation d WHERE d.campaign.id = :campaignId")
+    List<Donator> findDistinctBenefactorsByCampaignId(@Param("campaignId") Long campaignId);
 }

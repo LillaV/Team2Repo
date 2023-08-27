@@ -32,7 +32,7 @@ public class CampaignService{
     public List<CampaignDto> allCampaignsWithPagination(int offset, int pageSize){
         Page<Campaign> campaigns = campaignRepository.findAll(PageRequest.of(offset, pageSize));
         return campaigns.stream().map(campaign -> campaignMapper.campaignToCampaignDto(campaign)).collect(Collectors.toList());
-    }//intrebat
+    }
 
     public List<CampaignDto> getCampaigns(){
         List<Campaign> campaigns=campaignRepository.findAll();
@@ -70,7 +70,7 @@ public class CampaignService{
         Page<Campaign> campaigns = campaignRepository.findAll(spec, pageable);
 
         return  new CampaignFilterPair(campaigns.stream().collect(Collectors.toList()), size);
-    }//has no tests
+    }
 
     public long getSize() {
         return campaignRepository.count();

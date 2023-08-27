@@ -6,10 +6,6 @@ import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Donation;
 import de.msg.javatraining.donationmanager.persistence.repository.CampaignRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.DonationRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import org.hamcrest.Matchers;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
@@ -152,7 +148,6 @@ class CampaignServiceTest {
     @Test
     public void deleteCampaignById_deleteSuccessful_whenCampaignIsPresent(){
         List <Campaign> campList=generate();
-        List<CampaignDto> dtoList=generateDtos();
 
         when(campaignRepository.findById(1L)).thenReturn(Optional.of(campList.get(0)));
         when(donationRepository.existsByCampaignAndApprovedTrue(campList.get(0))).thenReturn(false);

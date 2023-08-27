@@ -7,7 +7,6 @@ import de.msg.javatraining.donationmanager.persistence.repository.DonationReposi
 import de.msg.javatraining.donationmanager.persistence.repository.DonatorRepository;
 import de.msg.javatraining.donationmanager.service.validation.DonatorValidator;
 import org.hamcrest.Matchers;
-import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -65,13 +64,15 @@ class DonatorServiceTest {
     @Test
     public void getDonators_returnList_inAllCases(){
         List<Donator> donList=generate();
+        List<SimpleDonatorDto> dtoList=generateDtos();
 
         when(donatorRepository.findAll()).thenReturn(donList);
+        when(donatorMapper.donatorsToSimpleDonatorDtos(donList)).thenReturn(dtoList);
 
-        List<Donator> donatorList=donatorService.getDonators();
+        List<SimpleDonatorDto> donatorList=donatorService.getDonators();
 
         verify(donatorRepository).findAll();
-        assertThat(donList, Matchers.is(donatorList));
+        assertThat(dtoList, Matchers.is(donatorList));
     }
     @Test
     public void saveDonator_saveSuccessful_whenValid(){
@@ -125,17 +126,17 @@ class DonatorServiceTest {
         verify(donatorRepository).save(donator);
     }
 
-//    @Test
-//    public void updateDonator_updateUnsuccessful_whenInvalid(){
-//        SimpleDonatorDto donatorDto=new SimpleDonatorDto(1L,"First","Last","Additional","");
-//        Donator donator=new Donator(1L,"First","Last","Additional","");
-//
-//        when(donatorRepository.findById(1L)).thenReturn(Optional.of(donator));
-//        donator.setFirstName("Firs1");
-//        when(donatorRepository.save(donator)).thenThrow(CevaEx.class);
-//
-//        assertThrows(CevaEx.class,()->donatorService.updateDonator(donatorDto.getId(),donatorDto));
-//    } //aici pot fi 2 functii deoarece arunca posibil 2 exceptii diferite su poate nu
+    @Test
+    public void updateDonator_updateUnsuccessful_whenInvalid(){
+        SimpleDonatorDto donatorDto=new SimpleDonatorDto(1L,"First","Last","Additional","");
+        Donator donator=new Donator(1L,"First","Last","Additional","");
+
+        when(donatorRepository.findById(1L)).thenReturn(Optional.of(donator));
+        donator.setFirstName("Firs1");
+        //when(donatorRepository.save(donator)).thenThrow(CevaEx.class);
+
+        //assertThrows(CevaEx.class,()->donatorService.updateDonator(donatorDto.getId(),donatorDto));
+    } //aici 2 functii deoarece arunca 2 exceptii diferite
 
     @Test
     public void findById_findSuccessful_whenValid(){
@@ -180,7 +181,6 @@ class DonatorServiceTest {
     @Test
     public void deleteDonatorById_deleteSuccessful_whenNoDonationsByDonator(){
         List<Donator> donList=generate();
-        List<SimpleDonatorDto> dtoList=generateDtos();
 
         when(donationRepository.existsByBenefactorId(donList.get(0).getId())).thenReturn(false);
         doNothing().when(donatorRepository).deleteById(donList.get(0).getId());

@@ -35,13 +35,14 @@ public class DonatorService {
 
     @Autowired
     DonatorValidator donatorValidator;
-    public List<Donator> allDonatorsWithPagination(int offset, int pageSize){
+    public List<SimpleDonatorDto> allDonatorsWithPagination(int offset, int pageSize){
         Page<Donator> donators =  donatorRepository.findAll(PageRequest.of(offset, pageSize));
-        return donators.stream().collect(Collectors.toList());
+        return donators.stream().map(donator -> donatorMapper.donatorToSimpleDonatorDto(donator)).collect(Collectors.toList());
     }
 
-    public List<Donator> getDonators(){
-        return donatorRepository.findAll();
+    public List<SimpleDonatorDto> getDonators(){
+        List<Donator> donators=donatorRepository.findAll();
+        return donatorMapper.donatorsToSimpleDonatorDtos(donators);
     }
 
     public Donator updateDonator(Long id, SimpleDonatorDto simpleDonatorDto) {

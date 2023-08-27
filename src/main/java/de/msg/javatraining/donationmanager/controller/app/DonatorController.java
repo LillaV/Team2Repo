@@ -1,7 +1,6 @@
 package de.msg.javatraining.donationmanager.controller.app;
 
 import de.msg.javatraining.donationmanager.persistence.dtos.donator.SimpleDonatorDto;
-import de.msg.javatraining.donationmanager.persistence.model.Donator;
 import de.msg.javatraining.donationmanager.service.DonatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,7 @@ public class DonatorController {
     private DonatorService donatorService;
 
     @GetMapping
-    public List<Donator> getDonations(
+    public List<SimpleDonatorDto> getDonators(
             @RequestParam(name = "offset", required = false) Integer offset,
             @RequestParam(name = "pageSize", required = false) Integer pageSize) {
         if (offset != null && pageSize != null) {

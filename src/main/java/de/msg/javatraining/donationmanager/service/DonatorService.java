@@ -5,8 +5,6 @@ import de.msg.javatraining.donationmanager.persistence.dtos.donator.SimpleDonato
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.DonatorMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.response.TextResponse;
 import de.msg.javatraining.donationmanager.persistence.model.Donator;
-import de.msg.javatraining.donationmanager.persistence.model.Role;
-import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.repository.DonationRepository;
 import de.msg.javatraining.donationmanager.persistence.repository.DonatorRepository;
 import de.msg.javatraining.donationmanager.service.validation.DonatorValidator;

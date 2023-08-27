@@ -2,6 +2,8 @@ package de.msg.javatraining.donationmanager.service;
 
 import de.msg.javatraining.donationmanager.config.exception.InvalidRequestException;
 import de.msg.javatraining.donationmanager.config.exception.UserNotFoundException;
+import de.msg.javatraining.donationmanager.persistence.dtos.campaign.CampaignDto;
+import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CampaignMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.CreateUserMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.RoleMapper;
 import de.msg.javatraining.donationmanager.persistence.dtos.mappers.UserMapper;
@@ -13,6 +15,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
+import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Permission;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
@@ -63,6 +66,9 @@ class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
+
+    @Mock
+    CampaignMapper campaignMapper;
 
     @InjectMocks
     UserService userService;
@@ -369,6 +375,74 @@ class UserServiceTest {
         verify(userRepository).findAll();
         assertThat(userDtos, Matchers.is(userDtosFinal));
     }
+
+
+    @Test
+    public void deleteUser_deleteSuccessful(){
+        List<User> users = getUserEntities();
+
+        TextResponse actualResponse = userService.deleteUserById(7L);
+        TextResponse expectedResponse = new TextResponse("User deleted successfully !");
+
+        verify(userRepository).deleteById(users.get(0).getId());
+        assertThat(actualResponse, equalTo(expectedResponse));
+    }
+
+    @Test
+    public void addCampaignsToREP_addFailed_whenUserNotPresent(){
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        List<CampaignDto> campaignDtos = new ArrayList<>();
+
+        assertThrows(UserNotFoundException.class,() ->userService.addCampaignsToREP(campaignDtos,1L));
+    }
+    @Test
+    public void addCampaignsToREP_addFailed_whenUserHasNotREPRole(){
+        List<User> users = getUserEntities();
+
+        User user = users.get(0);
+        Set<Role> roles = new HashSet<>();
+        roles.add(new Role(ERole.ADM, new HashSet<Permission>()));
+        user.setRoles(roles);
+        List<CampaignDto> campaignDtos = new ArrayList<>();
+
+        when(userRepository.findById(7L)).thenReturn(Optional.of(user));
+
+        assertThrows(InvalidRequestException.class, () -> userService.addCampaignsToREP(campaignDtos,user.getId()));
+    }
+
+//    @Test
+//    public void addCampaignsToREP_addSuccessful_whenAllRequirementsAreMet(){
+//        List<User> users = getUserEntities();
+//
+//        User user = users.get(0);
+//        Set<Role> roles = new HashSet<>();
+//        roles.add(new Role(ERole.REP, new HashSet<Permission>()));
+//        user.setRoles(roles);
+//        List<CampaignDto> campaignDtos = new ArrayList<>();
+//        campaignDtos.add(new CampaignDto(1L,"C1","Purpose"));
+//        campaignDtos.add(new CampaignDto(2L,"C2","Purpose"));
+//        campaignDtos.add(new CampaignDto(3L,"C3","Purpose"));
+//
+//        Set<Campaign> campaigns = new HashSet<>();
+//        Campaign campaign = new Campaign();
+//        campaign.setName("C1");
+//        campaign.setPurpose("Purpose");
+//        campaigns.add(campaign);
+//        Campaign campaign2 = new Campaign();
+//        campaign.setName("C2");
+//        campaign.setPurpose("Purpose");
+//        campaigns.add(campaign2);
+//        Campaign campaign3 = new Campaign();
+//        campaign.setName("C3");
+//        campaign.setPurpose("Purpose");
+//        campaigns.add(campaign3);
+//
+//        when(userRepository.findById(7L)).thenReturn(Optional.of(user));
+//        when(user.getCampaigns()).thenReturn(campaigns);
+//        when(campaignMapper.campaignDtosToCampaigns(campaignDtos)).thenReturn(campaigns);
+//    }
+
+
 
     private List<User> getUserEntities() {
         List<User> users = new ArrayList<>();

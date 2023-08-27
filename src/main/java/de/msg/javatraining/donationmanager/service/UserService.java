@@ -15,6 +15,7 @@ import de.msg.javatraining.donationmanager.persistence.dtos.user.CreateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.FirstLoginDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UpdateUserDto;
 import de.msg.javatraining.donationmanager.persistence.dtos.user.UserDto;
+import de.msg.javatraining.donationmanager.persistence.model.Campaign;
 import de.msg.javatraining.donationmanager.persistence.model.Role;
 import de.msg.javatraining.donationmanager.persistence.model.User;
 import de.msg.javatraining.donationmanager.persistence.model.enums.ERole;
@@ -171,7 +172,9 @@ public class UserService {
         if(!hasRoleREP){
             throw new   InvalidRequestException("The user doesn't have  the  necessary role!");
         }
-        user.getCampaigns().addAll(campaigns.stream().map(campaignMapper::campaignDtoToCampaign).collect(Collectors.toSet()));
+       user.getCampaigns().addAll(campaigns.stream().map(campaignMapper::campaignDtoToCampaign).collect(Collectors.toSet()));
+//        Set<Campaign> userCampaigns=user.getCampaigns();
+//        userCampaigns = (Set<Campaign>) campaignMapper.campaignDtosToCampaigns(campaigns);
         userRepository.save(user);
         return new TextResponse("The  campaigns were added successfully!");
     }
